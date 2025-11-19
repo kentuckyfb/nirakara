@@ -1,0 +1,26 @@
+{
+  "intro": {
+    "eyebrow": "Returns & Warranty",
+    "title": "Care Promise",
+    "description": "Our pieces are built to be serviced. Read how we handle returns, repairs, and aftercare globally."
+  },
+  "policy": [
+    {
+      "heading": "Return Window",
+      "text": "Ready-to-ship pieces can be returned within 14 days of delivery in original condition. Made-to-order items are eligible for studio credit."
+    },
+    {
+      "heading": "Warranty",
+      "text": "Lifetime polishing and structural repairs are included for sterling silver jewelry. Gold vermeil replating is complimentary for the first year."
+    },
+    {
+      "heading": "Process",
+      "text": "Email care@nirakara.studio with your order number. We arrange insured pickup through DHL and share tracking for transparency."
+    }
+  ],
+  "help": {
+    "title": "Need Assistance?",
+    "text": "The care team replies within 24 hours. Include close-up photos if you are requesting a repair so we can send an accurate estimate for turnaround time."
+  }
+}
+

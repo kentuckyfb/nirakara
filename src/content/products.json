@@ -1,0 +1,126 @@
+﻿[
+  {
+    "id": "ritual-ring-001",
+    "slug": "ritual-ring-001",
+    "name": "U-01 / Ritual Ring",
+    "unitCode": "U-01",
+    "category": "ring",
+    "priceLKR": 9500,
+    "shortDescription": "Hammered silver with intentional chaos. Worn like armor.",
+    "description": "A statement ring with rough, textured surfaces that catch light from every angle. Each piece is unique, hammered by hand to create intentional imperfections. This is jewelry that tells a story.",
+    "images": ["/src/assets/product-ring-1.jpg", "/src/assets/product-ring-2.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Distressed finish",
+      "Weight: approx 8g"
+    ],
+    "isFeatured": true,
+    "finish": "distressed",
+    "weight": "8g"
+  },
+  {
+    "id": "concrete-chain-001",
+    "slug": "concrete-chain-001",
+    "name": "U-02 / Static Chain",
+    "unitCode": "U-02",
+    "category": "chain",
+    "priceLKR": 18500,
+    "shortDescription": "Bold, chunky links. Urban nights captured in silver.",
+    "description": "Inspired by city infrastructure and industrial design, this chain makes a statement without saying a word. Heavy, solid, and built to last.",
+    "images": ["/src/assets/product-chain-1.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Polished finish",
+      "Weight: approx 45g",
+      "Length: 55cm"
+    ],
+    "isFeatured": true,
+    "finish": "polished",
+    "weight": "45g"
+  },
+  {
+    "id": "orbit-cuff-001",
+    "slug": "orbit-cuff-001",
+    "name": "U-03 / City Cuff",
+    "unitCode": "U-03",
+    "category": "ear-cuff",
+    "priceLKR": 7200,
+    "shortDescription": "Geometric ear cuff. Futuristic minimal design.",
+    "description": "A single piece that wraps around the ear without piercing. Clean lines meet sculptural form. Wear on either ear, stack with others, make it yours.",
+    "images": ["/src/assets/product-earcuff-1.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Polished finish",
+      "Weight: approx 3g",
+      "No piercing required"
+    ],
+    "isFeatured": true,
+    "finish": "polished",
+    "weight": "3g"
+  },
+  {
+    "id": "chaos-bracelet-001",
+    "slug": "chaos-bracelet-001",
+    "name": "U-04 / Echo Bracelet",
+    "unitCode": "U-04",
+    "category": "bracelet",
+    "priceLKR": 14800,
+    "shortDescription": "Chunky, distressed, unapologetic. Pure controlled chaos.",
+    "description": "Heavy silver with a brushed, industrial finish. This bracelet has weight, presence, and attitude. It's not subtle, and that's the point.",
+    "images": ["/src/assets/product-bracelet-1.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Brushed finish",
+      "Weight: approx 35g",
+      "Adjustable"
+    ],
+    "isFeatured": true,
+    "finish": "brushed",
+    "weight": "35g"
+  },
+  {
+    "id": "shadow-ring-002",
+    "slug": "shadow-ring-002",
+    "name": "U-05 / Signal Ring",
+    "unitCode": "U-05",
+    "category": "ring",
+    "priceLKR": 8900,
+    "shortDescription": "Smooth, minimal, quietly confident.",
+    "description": "A cleaner take on our signature style. Polished silver with subtle texture that reveals itself in the right light. Everyday luxury.",
+    "images": ["/src/assets/product-ring-2.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Polished finish",
+      "Weight: approx 6g"
+    ],
+    "isFeatured": false,
+    "finish": "polished",
+    "weight": "6g"
+  },
+  {
+    "id": "night-ring-003",
+    "slug": "night-ring-003",
+    "name": "U-06 / Night Ring",
+    "unitCode": "U-06",
+    "category": "ring",
+    "priceLKR": 10200,
+    "shortDescription": "Wide band. Bold statement. City energy.",
+    "description": "A wider band for those who want their jewelry to be seen and felt. Textured surface catches light like city streets in the rain.",
+    "images": ["/src/assets/product-ring-1.jpg"],
+    "highlights": [
+      "Handmade inside the Nirakara studio",
+      "925 sterling silver",
+      "Distressed finish",
+      "Weight: approx 12g"
+    ],
+    "isFeatured": false,
+    "finish": "distressed",
+    "weight": "12g"
+  }
+]
+

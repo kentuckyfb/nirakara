@@ -1,0 +1,28 @@
+{
+  "intro": {
+    "eyebrow": "Journal",
+    "title": "Studio Log",
+    "description": "Essays and dispatches from the Nirakara bench, updated monthly."
+  },
+  "posts": [
+    {
+      "title": "Working Silver in Monsoon Humidity",
+      "date": "January 12, 2025",
+      "excerpt": "Our bench jewellers switch to low-heat soldering and longer pickle baths as the coastal humidity rises. Here is how the workflow adapts without compromising finish.",
+      "tags": ["craft", "process"]
+    },
+    {
+      "title": "Partnering with Negombo Fishery Collectives",
+      "date": "December 05, 2024",
+      "excerpt": "We source oyster shell buttons and pearl seconds from a cooperative that reinvests in reef rehabilitation. This is their story and why we pay above-market rates.",
+      "tags": ["community", "sourcing"]
+    },
+    {
+      "title": "The Archive Ring Sizes We Track",
+      "date": "October 22, 2024",
+      "excerpt": "A nerdy dive into the data we collect on ring sizing per geography and how it informs limited runs for each drop.",
+      "tags": ["data", "studio"]
+    }
+  ]
+}
+

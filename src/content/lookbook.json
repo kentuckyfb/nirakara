@@ -1,0 +1,37 @@
+{
+  "intro": {
+    "eyebrow": "Lookbook // Resort 2025",
+    "title": "Nirakara Study",
+    "description": "Documenting the intersection of architecture, coastline light, and silverwork through three concise drops. All imagery captured in Sri Lanka using natural light only."
+  },
+  "looks": [
+    {
+      "title": "Monsoon Resonance",
+      "description": "Hand-forged cuffs and collar pieces shaped after the curves of Colombo's brutalist facades.",
+      "image": "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "title": "Sand & Signal",
+      "description": "Warm neutral textiles pairing with matte sterling pendants for Salt Flats evenings.",
+      "image": "https://images.unsplash.com/photo-1484519332611-516457305ff6?auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "title": "Night Bloom",
+      "description": "Charcoal knit layers contrasted with obsidian-coated hoops inspired by coastal night jasmine.",
+      "image": "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=1000&q=80"
+    }
+  ],
+  "spotlight": [
+    {
+      "heading": "Colombo Dawn",
+      "copy": "A study in pale blues and burnished silver, shot at 05:30 hrs along the Galle Face coastline.",
+      "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "heading": "Ritual Kinetics",
+      "copy": "Layered chains engineered to move like water while remaining weightless on the wearer.",
+      "image": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80"
+    }
+  ]
+}
+

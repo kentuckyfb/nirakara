@@ -1,0 +1,21 @@
+{
+  "intro": {
+    "eyebrow": "Sizing Guide",
+    "title": "Precision Fit",
+    "description": "Measure when hands are warm and at the end of the day. We offer complimentary resizing on sterling bands within 60 days of delivery."
+  },
+  "method": [
+    "Wrap a strip of paper around the widest point of your finger.",
+    "Mark the overlap, lay flat, and measure the length in millimetres.",
+    "Match the reading with the chart to select your US size."
+  ],
+  "notes": "We recommend sizing up for stacked rings or wide bands over 6 mm.",
+  "ringChart": [
+    { "us": 5, "inner": "15.7 mm", "note": "Petite fit" },
+    { "us": 6, "inner": "16.5 mm", "note": "Standard XS/S" },
+    { "us": 7, "inner": "17.3 mm", "note": "Sample size" },
+    { "us": 8, "inner": "18.1 mm", "note": "Medium" },
+    { "us": 9, "inner": "18.9 mm", "note": "Large" }
+  ]
+}
+

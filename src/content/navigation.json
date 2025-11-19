@@ -1,0 +1,31 @@
+{
+  "main": [
+    { "label": "Shop", "href": "/shop" },
+    { "label": "Lookbook", "href": "/lookbook" },
+    { "label": "About", "href": "/about" },
+    { "label": "Journal", "href": "/journal" }
+  ],
+  "footer": {
+    "shop": [
+      { "label": "All Products", "href": "/shop" },
+      { "label": "Rings", "href": "/shop?category=ring" },
+      { "label": "Chains", "href": "/shop?category=chain" },
+      { "label": "Bracelets", "href": "/shop?category=bracelet" },
+      { "label": "Ear Cuffs", "href": "/shop?category=ear-cuff" }
+    ],
+    "info": [
+      { "label": "Materials & Craft", "href": "/materials" },
+      { "label": "Sizing Guide", "href": "/sizing" },
+      { "label": "FAQ", "href": "/faq" },
+      { "label": "Returns & Warranty", "href": "/returns" },
+      { "label": "Cookie Policy", "href": "/cookie-policy" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "explore": [
+      { "label": "Campaigns", "href": "/campaigns" },
+      { "label": "Materials & Craft", "href": "/materials" },
+      { "label": "Sizing Guide", "href": "/sizing" }
+    ]
+  }
+}
+

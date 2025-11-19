@@ -1,0 +1,27 @@
+{
+  "intro": {
+    "eyebrow": "About",
+    "title": "Nirakara Studio",
+    "description": "Founded in 2019, Nirakara is a Colombo-based silver house designing objects influenced by South Asian modernism and coastal rituals. We maintain a transparent, slow-production model anchored by local partners."
+  },
+  "studio": {
+    "title": "Studio Coordinates",
+    "paragraphs": [
+      "Our workshop overlooks the Kelani River. Proximity to the port allows us to ship worldwide every Wednesday, while the studio remains open for fittings by appointment.",
+      "Creative director Suren Dias studied industrial design in Singapore and returned to Sri Lanka to produce jewelry that reflects regional geometry and craft."
+    ]
+  },
+  "production": {
+    "title": "Production Notes",
+    "paragraphs": [
+      "Casting, filing, and finishing are completed in micro-batches. Pieces are packaged in recycled rubber pouches produced by the Ride 4 ReLife initiative.",
+      "Each order includes a care log where we document maintenance history during complimentary yearly polishing."
+    ]
+  },
+  "values": [
+    { "title": "Local Craft First", "description": "Every collection is fabricated in Colombo or Matara by six goldsmith families we work with year-round." },
+    { "title": "Measured Releases", "description": "Drops are capped based on recycled metal available each quarter, avoiding overproduction." },
+    { "title": "Transparent Pricing", "description": "We publish material costs and labour hours for our core catalogue so clients know the origin of every rupee." }
+  ]
+}
+

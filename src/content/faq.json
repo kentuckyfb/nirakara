@@ -1,0 +1,26 @@
+{
+  "intro": {
+    "eyebrow": "FAQ",
+    "title": "Answers & Logistics",
+    "description": "Practical details for ordering, caring, and receiving Nirakara pieces."
+  },
+  "questions": [
+    {
+      "q": "How long do made-to-order pieces take?",
+      "a": "Sterling silver pieces require 10-14 days. Gold vermeil may add 5 days for electroplating. You will receive a status email at casting, finishing, and shipping."
+    },
+    {
+      "q": "Do you ship internationally?",
+      "a": "Yes. We ship worldwide via DHL Express every Wednesday. Duties are calculated at checkout using HS code 7113 for silver jewelry."
+    },
+    {
+      "q": "Can I resize my ring?",
+      "a": "One complimentary resize is available within 60 days of delivery for sterling silver bands between sizes 5-10."
+    },
+    {
+      "q": "How should I care for my pieces?",
+      "a": "Keep jewelry dry, store separately in the recycled rubber pouch provided, and polish with the included treated cloth. Avoid ultrasonic cleaners for oxidized finishes."
+    }
+  ]
+}
+

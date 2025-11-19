@@ -1,0 +1,31 @@
+{
+  "hero": {
+    "signals": [
+      "Signal 01",
+      "2025 Edition",
+      "Release Tempo // Slow Forge"
+    ],
+    "title": "Silver without defined edges.",
+    "subtitle": "Each piece starts as a pause. We map negative space, sketch air, and let recycled silver wrap around the absence until the gesture feels calm.",
+    "quote": "Nirakara is meditation for the hands. The surfaces stay raw so the wearer can feel the rhythm of the studio.",
+    "studioIndex": [
+      { "label": "Batch", "value": "04" },
+      { "label": "Forms", "value": "12" },
+      { "label": "Archive", "value": "145" }
+    ]
+  },
+  "featured": {
+    "eyebrow": "Featured Forms",
+    "heading": "Limited objects from the Nirakara archive.",
+    "summary": "Released in deliberate batches. Each form is catalogued with its own signal number and log note.",
+    "ctaLabel": "View All"
+  },
+  "newsletter": {
+    "eyebrow": "Pulse",
+    "heading": "Stay synced with the studio cadence.",
+    "body": "Receive drop timings, research notes, and invites to closed ritual demonstrations. No noise, only calm transmissions.",
+    "placeholder": "your@signal.com",
+    "ctaLabel": "Connect",
+    "footnote": "We send transmissions only when something meaningful emerges."
+  }
+}
