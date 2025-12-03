@@ -1,0 +1,480 @@
+[
+    {
+        "id": "ritual-ring-001",
+        "slug": "ritual-ring-001",
+        "name": "U-01 / Ritual Ring",
+        "unitCode": "U-01",
+        "category": "ring",
+        "priceLKR": 9500,
+        "image": "/products/ritual_ring.png",
+        "shortDescription": "Hammered silver with intentional chaos. Worn like armor.",
+        "description": "A statement ring with rough, textured surfaces that catch light from every angle. Each piece is unique, hammered by hand to create intentional imperfections. This is jewelry that tells a story.",
+        "images": [
+            "/products/ritual_ring.png",
+            "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Distressed finish",
+            "Weight: approx 8g"
+        ],
+        "isFeatured": true,
+        "finish": "distressed",
+        "weight": "8g"
+    },
+    {
+        "id": "concrete-chain-001",
+        "slug": "concrete-chain-001",
+        "name": "U-02 / Static Chain",
+        "unitCode": "U-02",
+        "category": "chain",
+        "priceLKR": 18500,
+        "image": "/products/static_chain.png",
+        "shortDescription": "Bold, chunky links. Urban nights captured in silver.",
+        "description": "Inspired by city infrastructure and industrial design, this chain makes a statement without saying a word. Heavy, solid, and built to last.",
+        "images": [
+            "/products/static_chain.png",
+            "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 45g",
+            "Length: 55cm"
+        ],
+        "isFeatured": true,
+        "finish": "polished",
+        "weight": "45g"
+    },
+    {
+        "id": "orbit-cuff-001",
+        "slug": "orbit-cuff-001",
+        "name": "U-03 / City Cuff",
+        "unitCode": "U-03",
+        "category": "ear-cuff",
+        "priceLKR": 7200,
+        "image": "/products/city_cuff.png",
+        "shortDescription": "Geometric ear cuff. Futuristic minimal design.",
+        "description": "A single piece that wraps around the ear without piercing. Clean lines meet sculptural form. Wear on either ear, stack with others, make it yours.",
+        "images": [
+            "/products/city_cuff.png",
+            "https://images.unsplash.com/photo-1596944924591-4824b21ed2b7?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 3g",
+            "No piercing required"
+        ],
+        "isFeatured": true,
+        "finish": "polished",
+        "weight": "3g"
+    },
+    {
+        "id": "chaos-bracelet-001",
+        "slug": "chaos-bracelet-001",
+        "name": "U-04 / Echo Bracelet",
+        "unitCode": "U-04",
+        "category": "bracelet",
+        "priceLKR": 14800,
+        "image": "/products/echo_bracelet.png",
+        "shortDescription": "Chunky, distressed, unapologetic. Pure controlled chaos.",
+        "description": "Heavy silver with a brushed, industrial finish. This bracelet has weight, presence, and attitude. It's not subtle, and that's the point.",
+        "images": [
+            "/products/echo_bracelet.png",
+            "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Brushed finish",
+            "Weight: approx 35g",
+            "Adjustable"
+        ],
+        "isFeatured": true,
+        "finish": "brushed",
+        "weight": "35g"
+    },
+    {
+        "id": "shadow-ring-002",
+        "slug": "shadow-ring-002",
+        "name": "U-05 / Signal Ring",
+        "unitCode": "U-05",
+        "category": "ring",
+        "priceLKR": 8900,
+        "image": "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Smooth, minimal, quietly confident.",
+        "description": "A cleaner take on our signature style. Polished silver with subtle texture that reveals itself in the right light. Everyday luxury.",
+        "images": [
+            "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1614170242027-5bda22e4c8b6?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 6g"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "6g"
+    },
+    {
+        "id": "night-ring-003",
+        "slug": "night-ring-003",
+        "name": "U-06 / Night Ring",
+        "unitCode": "U-06",
+        "category": "ring",
+        "priceLKR": 10200,
+        "image": "https://images.unsplash.com/photo-1614170242027-5bda22e4c8b6?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Wide band. Bold statement. City energy.",
+        "description": "A wider band for those who want their jewelry to be seen and felt. Textured surface catches light like city streets in the rain.",
+        "images": [
+            "https://images.unsplash.com/photo-1614170242027-5bda22e4c8b6?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Distressed finish",
+            "Weight: approx 12g"
+        ],
+        "isFeatured": false,
+        "finish": "distressed",
+        "weight": "12g"
+    },
+    {
+        "id": "lunar-chain-002",
+        "slug": "lunar-chain-002",
+        "name": "U-07 / Lunar Chain",
+        "unitCode": "U-07",
+        "category": "chain",
+        "priceLKR": 16200,
+        "image": "https://images.unsplash.com/photo-1610810322498-bdd3d0f10af3?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Delicate silver links. Subtle sophistication.",
+        "description": "Fine chain with minimalist aesthetic. Light enough to layer, strong enough to stand alone.",
+        "images": [
+            "https://images.unsplash.com/photo-1610810322498-bdd3d0f10af3?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 28g",
+            "Length: 50cm"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "28g"
+    },
+    {
+        "id": "void-ring-004",
+        "slug": "void-ring-004",
+        "name": "U-08 / Void Ring",
+        "unitCode": "U-08",
+        "category": "ring",
+        "priceLKR": 9800,
+        "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Minimalist band. Pure form.",
+        "description": "Simple elegance in solid silver. A band that speaks through silence.",
+        "images": [
+            "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Matte finish",
+            "Weight: approx 7g"
+        ],
+        "isFeatured": false,
+        "finish": "brushed",
+        "weight": "7g"
+    },
+    {
+        "id": "edge-cuff-002",
+        "slug": "edge-cuff-002",
+        "name": "U-09 / Edge Cuff",
+        "unitCode": "U-09",
+        "category": "ear-cuff",
+        "priceLKR": 7800,
+        "image": "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Angular ear cuff. Architectural precision.",
+        "description": "Clean lines define this sculptural piece. Modern design meets ancient craft.",
+        "images": [
+            "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 4g",
+            "No piercing required"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "4g"
+    },
+    {
+        "id": "forge-bracelet-002",
+        "slug": "forge-bracelet-002",
+        "name": "U-10 / Forge Bracelet",
+        "unitCode": "U-10",
+        "category": "bracelet",
+        "priceLKR": 13500,
+        "image": "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Twisted silver bands. Raw elegance.",
+        "description": "Multiple bands twist together in organic harmony. Each movement reveals new facets.",
+        "images": [
+            "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Oxidized finish",
+            "Weight: approx 32g",
+            "Adjustable"
+        ],
+        "isFeatured": false,
+        "finish": "distressed",
+        "weight": "32g"
+    },
+    {
+        "id": "storm-ring-005",
+        "slug": "storm-ring-005",
+        "name": "U-11 / Storm Ring",
+        "unitCode": "U-11",
+        "category": "ring",
+        "priceLKR": 11500,
+        "image": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Textured surface. Dynamic presence.",
+        "description": "Rough-hewn silver captures the energy of a storm. Bold, dramatic, unforgettable.",
+        "images": [
+            "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Oxidized finish",
+            "Weight: approx 10g"
+        ],
+        "isFeatured": false,
+        "finish": "distressed",
+        "weight": "10g"
+    },
+    {
+        "id": "pulse-chain-003",
+        "slug": "pulse-chain-003",
+        "name": "U-12 / Pulse Chain",
+        "unitCode": "U-12",
+        "category": "chain",
+        "priceLKR": 19800,
+        "image": "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Heavy links. Commanding attention.",
+        "description": "Statement chain with substantial weight. Each link hand-finished to perfection.",
+        "images": [
+            "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Brushed finish",
+            "Weight: approx 52g",
+            "Length: 60cm"
+        ],
+        "isFeatured": false,
+        "finish": "brushed",
+        "weight": "52g"
+    },
+    {
+        "id": "whisper-ring-006",
+        "slug": "whisper-ring-006",
+        "name": "U-13 / Whisper Ring",
+        "unitCode": "U-13",
+        "category": "ring",
+        "priceLKR": 8200,
+        "image": "https://images.unsplash.com/photo-1598560917505-59a6f3a6d132?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Delicate band. Quiet strength.",
+        "description": "Subtle elegance in a thin band. Simplicity refined to its essence.",
+        "images": [
+            "https://images.unsplash.com/photo-1598560917505-59a6f3a6d132?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 5g"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "5g"
+    },
+    {
+        "id": "zenith-cuff-003",
+        "slug": "zenith-cuff-003",
+        "name": "U-14 / Zenith Cuff",
+        "unitCode": "U-14",
+        "category": "ear-cuff",
+        "priceLKR": 8500,
+        "image": "https://images.unsplash.com/photo-1595464351007-d36c5e05951e?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Curved design. Fluid motion.",
+        "description": "Organic curves flow naturally around the ear. Art meets comfort.",
+        "images": [
+            "https://images.unsplash.com/photo-1595464351007-d36c5e05951e?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Brushed finish",
+            "Weight: approx 3.5g",
+            "No piercing required"
+        ],
+        "isFeatured": false,
+        "finish": "brushed",
+        "weight": "3.5g"
+    },
+    {
+        "id": "cascade-bracelet-003",
+        "slug": "cascade-bracelet-003",
+        "name": "U-15 / Cascade Bracelet",
+        "unitCode": "U-15",
+        "category": "bracelet",
+        "priceLKR": 15900,
+        "image": "https://images.unsplash.com/photo-1588444650700-c5886eea6634?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Layered bands. Flowing design.",
+        "description": "Multiple silver strands cascade together. Movement and stillness in perfect balance.",
+        "images": [
+            "https://images.unsplash.com/photo-1588444650700-c5886eea6634?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 38g",
+            "Adjustable"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "38g"
+    },
+    {
+        "id": "anchor-ring-007",
+        "slug": "anchor-ring-007",
+        "name": "U-16 / Anchor Ring",
+        "unitCode": "U-16",
+        "category": "ring",
+        "priceLKR": 10800,
+        "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Solid presence. Grounded energy.",
+        "description": "Substantial ring with architectural weight. Designed to be felt as much as seen.",
+        "images": [
+            "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Matte finish",
+            "Weight: approx 11g"
+        ],
+        "isFeatured": false,
+        "finish": "brushed",
+        "weight": "11g"
+    },
+    {
+        "id": "drift-chain-004",
+        "slug": "drift-chain-004",
+        "name": "U-17 / Drift Chain",
+        "unitCode": "U-17",
+        "category": "chain",
+        "priceLKR": 17500,
+        "image": "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Irregular links. Organic flow.",
+        "description": "Each link unique, creating an asymmetric rhythm. Wear your individuality.",
+        "images": [
+            "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Oxidized finish",
+            "Weight: approx 40g",
+            "Length: 52cm"
+        ],
+        "isFeatured": false,
+        "finish": "distressed",
+        "weight": "40g"
+    },
+    {
+        "id": "horizon-ring-008",
+        "slug": "horizon-ring-008",
+        "name": "U-18 / Horizon Ring",
+        "unitCode": "U-18",
+        "category": "ring",
+        "priceLKR": 9200,
+        "image": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Linear design. Clean geometry.",
+        "description": "Straight lines meet circular form. Modern minimalism at its finest.",
+        "images": [
+            "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 7.5g"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "7.5g"
+    },
+    {
+        "id": "flux-cuff-004",
+        "slug": "flux-cuff-004",
+        "name": "U-19 / Flux Cuff",
+        "unitCode": "U-19",
+        "category": "ear-cuff",
+        "priceLKR": 7500,
+        "image": "https://images.unsplash.com/photo-1583292650898-7d22cd27ca6f?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Wave pattern. Organic form.",
+        "description": "Flowing curves mimic natural patterns. Lightweight comfort meets bold design.",
+        "images": [
+            "https://images.unsplash.com/photo-1583292650898-7d22cd27ca6f?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Polished finish",
+            "Weight: approx 3.2g",
+            "No piercing required"
+        ],
+        "isFeatured": false,
+        "finish": "polished",
+        "weight": "3.2g"
+    },
+    {
+        "id": "atlas-bracelet-004",
+        "slug": "atlas-bracelet-004",
+        "name": "U-20 / Atlas Bracelet",
+        "unitCode": "U-20",
+        "category": "bracelet",
+        "priceLKR": 16500,
+        "image": "https://images.unsplash.com/photo-1622434641406-a158123450f9?auto=format&fit=crop&w=600&q=80",
+        "shortDescription": "Cuff style. Powerful silhouette.",
+        "description": "Wide silver cuff with architectural presence. Statement piece for confident wear.",
+        "images": [
+            "https://images.unsplash.com/photo-1622434641406-a158123450f9?auto=format&fit=crop&w=800&q=80"
+        ],
+        "highlights": [
+            "Handmade inside the Nirakara studio",
+            "925 sterling silver",
+            "Brushed finish",
+            "Weight: approx 42g",
+            "Adjustable"
+        ],
+        "isFeatured": false,
+        "finish": "brushed",
+        "weight": "42g"
+    }
+]

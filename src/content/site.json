@@ -1,0 +1,20 @@
+{
+  "name": "NIRAKARA",
+  "tagline": "Formless metal rituals.",
+  "description": "Nirakara is a slow jewelry studio exploring meditative forms, raw textures, and mindful craft.",
+  "locale": "en-US",
+  "baseUrl": "https://nirakara.studio",
+  "slogan": "Silver without defined edges.",
+  "logo": {
+    "wordmark": "NIRAKARA"
+  },
+  "social": {
+    "instagram": "https://instagram.com/nirakara.studio",
+    "email": "hello@nirakara.studio",
+    "whatsapp": "+14155551234"
+  },
+  "footer": {
+    "copyright": "Nirakara Studio"
+  }
+}
+

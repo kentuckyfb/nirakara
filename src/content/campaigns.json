@@ -1,0 +1,31 @@
+{
+  "intro": {
+    "eyebrow": "Campaign Archive",
+    "title": "Field Dispatches",
+    "description": "Each campaign documents the craft process, partners, and environmental commitments tied to a release."
+  },
+  "entries": [
+    {
+      "title": "Signal / 2025",
+      "date": "February 2025",
+      "description": "An eight-piece capsule inspired by maritime telegraph codes. Features knurled textures and reversible pendants.",
+      "location": "Galle Face Green, Colombo",
+      "accent": "Current Dispatch"
+    },
+    {
+      "title": "Low Tide Study",
+      "date": "October 2024",
+      "description": "Explores negative space by pairing ultra-thin bangles with hollow-core cuffs. Produced in recycled sterling silver.",
+      "location": "Kalpitiya Peninsula",
+      "accent": "Archive"
+    },
+    {
+      "title": "Night Bloom",
+      "date": "June 2024",
+      "description": "Oxidized finishes with hand-carved patterns referencing indigenous night-blooming flora. All profits supported local reef care.",
+      "location": "Kanneliya Rainforest",
+      "accent": "Archive"
+    }
+  ]
+}
+

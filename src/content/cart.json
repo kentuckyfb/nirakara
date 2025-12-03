@@ -1,0 +1,18 @@
+{
+  "intro": {
+    "eyebrow": "Cart",
+    "title": "Ritual Manifest",
+    "description": "Items remain reserved for 20 minutes. Complimentary worldwide shipping on orders above LKR 75,000."
+  },
+  "items": [
+    { "code": "RG-01", "name": "Signal Band", "price": "LKR 42,000", "status": "Made to order" },
+    { "code": "CH-03", "name": "Low Tide Chain", "price": "LKR 58,000", "status": "In stock" }
+  ],
+  "summary": {
+    "subtotal": "LKR 100,000",
+    "shipping": "Complimentary",
+    "total": "LKR 100,000",
+    "cta": "Proceed to Checkout"
+  }
+}
+

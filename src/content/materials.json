@@ -1,0 +1,29 @@
+{
+  "intro": {
+    "eyebrow": "Materials & Craft",
+    "title": "Field Notes",
+    "description": "Every component is tracked from source to finishing. We collaborate with family-owned workshops in Colombo and Matara to keep the making close to our studio."
+  },
+  "materials": [
+    {
+      "title": "Sterling Silver .925",
+      "description": "Primary alloy sourced from recycled electronics through a Colombo partner foundry. Refined to .925 purity before casting.",
+      "details": ["Hypoallergenic alloy", "Hand-polished or oxidized", "Hallmarked per Sri Lankan Bureau of Standards"]
+    },
+    {
+      "title": "14K Gold Vermeil",
+      "description": "A thick 2.5 micron gold layer deposited over sterling silver. Electroplated in micro-batches to reduce waste.",
+      "details": ["European REACH compliant", "Warm champagne tone", "Anti-tarnish seal"]
+    },
+    {
+      "title": "Stone & Organics",
+      "description": "Locally sourced quartz, coconut-shell bead cores, and ethically certified pearls from Puttalam lagoon fisheries.",
+      "details": ["Hand-cut bezels", "Traceable supply partners", "Zero-dye finish"]
+    }
+  ],
+  "finishing": {
+    "title": "Finishing Lab",
+    "description": "Tumbling media is reused until neutralized. Oxidized finishes employ liver of sulfur diluted to food-grade standards and neutralized before disposal."
+  }
+}
+

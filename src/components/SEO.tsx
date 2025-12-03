@@ -1,0 +1,33 @@
+import { Helmet } from "react-helmet-async";
+
+interface SEOProps {
+    title?: string;
+    description?: string;
+    image?: string;
+    url?: string;
+}
+
+export function SEO({ title, description, image, url }: SEOProps) {
+    const siteTitle = "Nirakara";
+    const fullTitle = title ? `${title} | ${siteTitle}` : siteTitle;
+    const defaultDescription = "Handcrafted silver jewelry. Chaos in silver.";
+
+    return (
+        <Helmet>
+            <title>{fullTitle}</title>
+            <meta name="description" content={description || defaultDescription} />
+
+            {/* Open Graph */}
+            <meta property="og:title" content={fullTitle} />
+            <meta property="og:description" content={description || defaultDescription} />
+            {image && <meta property="og:image" content={image} />}
+            {url && <meta property="og:url" content={url} />}
+
+            {/* Twitter */}
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={fullTitle} />
+            <meta name="twitter:description" content={description || defaultDescription} />
+            {image && <meta name="twitter:image" content={image} />}
+        </Helmet>
+    );
+}

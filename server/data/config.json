@@ -1,0 +1,23 @@
+{
+    "title": "Archive",
+    "subtitle": "Explore our collection of handcrafted silver pieces. Each object is designed to evolve with its wearer.",
+    "filters": {
+        "categories": [
+            "All",
+            "Rings",
+            "Chains",
+            "Bracelets",
+            "Ear Cuffs"
+        ],
+        "materials": [
+            "Silver",
+            "Gold",
+            "Recycled Silver"
+        ],
+        "finishes": [
+            "Polished",
+            "Matte",
+            "Oxidized"
+        ]
+    }
+}

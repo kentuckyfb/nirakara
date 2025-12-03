@@ -1,0 +1,23 @@
+{
+  "hero": {
+    "signals": [
+      "Active"
+    ],
+    "title": "Silver without defined edges.",
+    "subtitle": "Each piece begins as a pause. Recycled silver wraps around absence until the gesture feels calm."
+  },
+  "featured": {
+    "eyebrow": "Collection",
+    "heading": "Hand-forged silver forms.",
+    "summary": "Each piece is made in small batches using recycled materials.",
+    "ctaLabel": "Explore"
+  },
+  "newsletter": {
+    "eyebrow": "Updates",
+    "heading": "Join our studio circle.",
+    "body": "Receive updates on new releases and studio notes.",
+    "placeholder": "Enter your email",
+    "ctaLabel": "Subscribe",
+    "footnote": "We only send meaningful updates."
+  }
+}

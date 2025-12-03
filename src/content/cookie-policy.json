@@ -1,0 +1,22 @@
+{
+  "intro": {
+    "eyebrow": "Cookie Policy",
+    "title": "Signals & Privacy",
+    "description": "Nirakara uses lightweight cookies to power the cart, account area, and performance analytics. We never sell or rent data, and we do not use third-party ad trackers."
+  },
+  "sections": [
+    {
+      "title": "What We Track",
+      "body": "Session cookies keep your cart and account form progress intact. Analytics cookies (Matomo, self-hosted) capture anonymous page performance data. No third-party advertising pixels are used."
+    },
+    {
+      "title": "How Long We Store Data",
+      "body": "Session cookies expire after closing the browser. Preference cookies that record consent choices last for 6 months. Analytics data is purged after 13 months."
+    },
+    {
+      "title": "Managing Preferences",
+      "body": "Use the banner or the buttons below to update consent at any time. Blocking cookies may impact cart persistence and login functionality."
+    }
+  ]
+}
+
