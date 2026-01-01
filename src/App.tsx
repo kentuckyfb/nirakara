@@ -27,6 +27,7 @@ const Account = lazy(() => import("./pages/Account"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Products = lazy(() => import("./pages/Products"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,7 @@ const App = () => (
 
               {/* Product detail route - no header/footer */}
               <Route path="/product/:slug" element={<ProductDetail />} />
+              <Route path="/products" element={<Products />} />
 
               {/* All other routes - with header/footer */}
               <Route path="*" element={

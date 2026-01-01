@@ -1,141 +1,81 @@
-import { auth, db, storage } from './firebase';
-import {
-    collection,
-    getDocs,
-    getDoc,
-    doc,
-    setDoc,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    query,
-    where
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import configData from '@/content/config.json';
+import axios from 'axios';
 
+const API_URL = 'http://localhost:3001/api';
 
+// Create an index to manage auth token locally if needed
+let authToken = localStorage.getItem('admin-token');
+
+const api = axios.create({
+    baseURL: API_URL,
+});
+
+// Add a request interceptor to include the auth token
+api.interceptors.request.use((config) => {
+    if (authToken) {
+        config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    return config;
+});
 
 export const getProducts = async () => {
     try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        return products;
+        const response = await api.get('/products');
+        return response.data;
     } catch (error) {
-        console.error('Firestore connection failed', error);
+        console.error('Failed to fetch products', error);
         return [];
     }
 };
 
 export const getProduct = async (slug: string) => {
     try {
-        // First try to find by slug
-        const q = query(collection(db, "products"), where("slug", "==", slug));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const doc = querySnapshot.docs[0];
-            return { id: doc.id, ...doc.data() };
-        }
-
-        // If not found by slug, try by ID (if slug is actually an ID)
-        const docRef = doc(db, "products", slug);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() };
-        }
-
-        return null;
+        const response = await api.get(`/products/${slug}`);
+        return response.data;
     } catch (error) {
-        console.error('Firestore connection failed', error);
+        console.error('Failed to fetch product', error);
         return null;
     }
 };
 
 export const getConfig = async () => {
     try {
-        const docRef = doc(db, "config", "main");
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            return docSnap.data();
-        }
-        // Return static config as fallback (config is static data)
-        return configData;
+        const response = await api.get('/config');
+        return response.data;
     } catch (error) {
-        console.warn('Firestore connection failed, using static config', error);
-        return configData;
+        console.error('Failed to fetch config', error);
+        return null;
     }
 };
 
 export const login = async (email: string, password: string) => {
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        const token = await user.getIdToken();
-        return { token, user: { email: user.email, uid: user.uid } };
+        const response = await api.post('/auth/login', { email, password });
+        const { token, user } = response.data;
+        authToken = token;
+        localStorage.setItem('admin-token', token);
+        return { token, user };
     } catch (error) {
         console.error("Login error", error);
         throw error;
     }
 };
 
+export const logout = async () => {
+    authToken = null;
+    localStorage.removeItem('admin-token');
+};
+
 // Admin functions
 export const createProduct = async (formData: FormData, token: string) => {
     try {
-        // 1. Extract data from FormData
-        const productData: any = {};
-        let imageFile: File | null = null;
-
-        formData.forEach((value, key) => {
-            if (key === 'image' && value instanceof File) {
-                imageFile = value;
-            } else {
-                productData[key] = value;
+        // We use the token passed or the one in the interceptor
+        const response = await api.post('/products', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
             }
         });
-
-        // 2. Upload Image to Storage
-        if (imageFile) {
-            const storageRef = ref(storage, `products/${Date.now()}-${(imageFile as File).name}`);
-            const snapshot = await uploadBytes(storageRef, imageFile);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-            productData.image = downloadURL;
-        }
-
-        // 3. Process other fields
-        if (productData.priceLKR) productData.priceLKR = Number(productData.priceLKR);
-
-        // Handle checkboxes - if not present in FormData, it means unchecked
-        productData.isFeatured = productData.isFeatured === 'true' || productData.isFeatured === true;
-        productData.isVisible = productData.isVisible === 'true' || productData.isVisible === true;
-
-        // Process array fields if they're strings
-        if (typeof productData.images === 'string') {
-            productData.images = productData.images.split(',').map((s: string) => s.trim()).filter(Boolean);
-        } else if (!productData.images) {
-            productData.images = [];
-        }
-
-        if (typeof productData.highlights === 'string') {
-            productData.highlights = productData.highlights.split(',').map((s: string) => s.trim()).filter(Boolean);
-        } else if (!productData.highlights) {
-            productData.highlights = [];
-        }
-
-        // 4. Save to Firestore
-        // Use slug as ID if available, otherwise auto-ID
-        const docId = productData.slug || `product-${Date.now()}`;
-        const docRef = doc(db, "products", docId);
-
-        // Ensure id field is set
-        productData.id = docId;
-
-        await setDoc(docRef, productData);
-        return { id: docId, ...productData };
+        return response.data;
     } catch (error) {
         console.error("Error creating product:", error);
         throw error;
@@ -144,69 +84,13 @@ export const createProduct = async (formData: FormData, token: string) => {
 
 export const updateProduct = async (id: string, formData: FormData, token: string) => {
     try {
-        // 1. Extract data
-        const productData: any = {};
-        let imageFile: File | null = null;
-
-        formData.forEach((value, key) => {
-            if (key === 'image' && value instanceof File) {
-                imageFile = value;
-            } else {
-                productData[key] = value;
+        const response = await api.put(`/products/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
             }
         });
-
-        // 2. Upload New Image if provided
-        if (imageFile) {
-            const storageRef = ref(storage, `products/${Date.now()}-${(imageFile as File).name}`);
-            const snapshot = await uploadBytes(storageRef, imageFile);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-            productData.image = downloadURL;
-        }
-
-        // 3. Process fields
-        if (productData.priceLKR) productData.priceLKR = Number(productData.priceLKR);
-
-        // Handle checkboxes - if not present in FormData, it means unchecked
-        productData.isFeatured = productData.isFeatured === 'true' || productData.isFeatured === true;
-        productData.isVisible = productData.isVisible === 'true' || productData.isVisible === true;
-
-        // Process array fields if they're strings
-        if (typeof productData.images === 'string') {
-            productData.images = productData.images.split(',').map((s: string) => s.trim()).filter(Boolean);
-        } else if (productData.images === '') {
-            productData.images = [];
-        }
-
-        if (typeof productData.highlights === 'string') {
-            productData.highlights = productData.highlights.split(',').map((s: string) => s.trim()).filter(Boolean);
-        } else if (productData.highlights === '') {
-            productData.highlights = [];
-        }
-
-        // 4. Update Firestore
-        // We need to find the document reference. ID passed might be slug or doc ID.
-        // Ideally we should use doc ID, but let's try to handle both or assume ID is passed correctly.
-        // In Admin.tsx, we are passing product.id.
-
-        // Check if doc exists with this ID
-        let docRef = doc(db, "products", id);
-        let docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-            // Try finding by slug if ID didn't work (legacy support)
-            const q = query(collection(db, "products"), where("slug", "==", id));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                docRef = querySnapshot.docs[0].ref;
-            } else {
-                throw new Error("Product not found");
-            }
-        }
-
-        await updateDoc(docRef, productData);
-        return { id, ...productData };
-
+        return response.data;
     } catch (error) {
         console.error("Error updating product:", error);
         throw error;
@@ -215,29 +99,15 @@ export const updateProduct = async (id: string, formData: FormData, token: strin
 
 export const deleteProduct = async (id: string, token: string) => {
     try {
-        let docRef = doc(db, "products", id);
-        let docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-            // Try finding by slug
-            const q = query(collection(db, "products"), where("slug", "==", id));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                docRef = querySnapshot.docs[0].ref;
-                docSnap = querySnapshot.docs[0];
-            } else {
-                throw new Error("Product not found");
+        const response = await api.delete(`/products/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        }
-
-        // Optional: Delete image from storage if needed
-        // const data = docSnap.data();
-        // if (data?.image && data.image.includes('firebasestorage')) { ... }
-
-        await deleteDoc(docRef);
-        return { success: true };
+        });
+        return response.data;
     } catch (error) {
         console.error("Error deleting product:", error);
         throw error;
     }
 };
+

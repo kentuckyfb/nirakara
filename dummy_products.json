@@ -1,0 +1,146 @@
+[
+    {
+        "id": "minimalist-silver-band",
+        "slug": "minimalist-silver-band",
+        "name": "Minimalist Silver Band",
+        "unitCode": "RING-001",
+        "category": "ring",
+        "priceLKR": 12500,
+        "image": "silver_ring_transparent_1767242277936.png",
+        "shortDescription": "A sleek, polished sterling silver band for everyday elegance.",
+        "description": "Crafted from high-quality sterling silver, this minimalist band features a smooth, polished finish. Its timeless design makes it perfect for stacking or wearing alone as a subtle statement piece.",
+        "images": [
+            "silver_ring_transparent_1767242277936.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Polished Finish",
+            "Hypoallergenic",
+            "Stackable Design"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "4g"
+    },
+    {
+        "id": "elegant-gold-link-chain",
+        "slug": "elegant-gold-link-chain",
+        "name": "Elegant Gold Link Chain",
+        "unitCode": "CHN-002",
+        "category": "chain",
+        "priceLKR": 45000,
+        "image": "gold_chain_transparent_1767242292037.png",
+        "shortDescription": "A delicate 18k gold chain with a classic link design.",
+        "description": "This elegant chain is crafted from 18k gold, featuring a fine link structure that catches the light beautifully. It's versatile enough to be worn with your favorite pendant or as a minimalist solo piece.",
+        "images": [
+            "gold_chain_transparent_1767242292037.png"
+        ],
+        "highlights": [
+            "18k Gold Plated",
+            "Adjustable Length",
+            "Secure Lobster Clasp",
+            "Lightweight and Comfortable"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "8g"
+    },
+    {
+        "id": "brushed-silver-cuff",
+        "slug": "brushed-silver-cuff",
+        "name": "Brushed Silver Cuff",
+        "unitCode": "BRC-003",
+        "category": "bracelet",
+        "priceLKR": 18500,
+        "image": "bracelet_transparent_1767242309799.png",
+        "shortDescription": "A modern silver cuff bracelet with a unique brushed texture.",
+        "description": "Make a statement with this contemporary silver cuff. The brushed finish gives it a sophisticated, matte look that complements any modern wardrobe. Its open design allows for easy adjustment to fit most wrists.",
+        "images": [
+            "bracelet_transparent_1767242309799.png"
+        ],
+        "highlights": [
+            "Solid Sterling Silver",
+            "Brushed Matte Finish",
+            "Adjustable Open Design",
+            "Durable Construction"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "brushed",
+        "weight": "12g"
+    },
+    {
+        "id": "geometric-ear-cuff",
+        "slug": "geometric-ear-cuff",
+        "name": "Geometric Ear Cuff",
+        "unitCode": "ECF-004",
+        "category": "ear-cuff",
+        "priceLKR": 7500,
+        "image": "ear_cuff_transparent_1767242328844.png",
+        "shortDescription": "A unique silver ear cuff featuring a geometric cutout design.",
+        "description": "Add an edgy touch to your look with this geometric ear cuff. No piercing required – simply slide it onto your ear for an instant style upgrade. The intricate cutout pattern adds a modern architectural feel.",
+        "images": [
+            "ear_cuff_transparent_1767242328844.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "No Piercing Required",
+            "Lightweight Geometric Design",
+            "Tarnish Resistant"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "2g"
+    },
+    {
+        "id": "classic-pearl-studs",
+        "slug": "classic-pearl-studs",
+        "name": "Classic Pearl Studs",
+        "unitCode": "ECF-005",
+        "category": "ear-cuff",
+        "priceLKR": 9500,
+        "image": "pearl_earrings_transparent_1767242450005.png",
+        "shortDescription": "Elegant white pearl studs with a timeless appeal.",
+        "description": "These elegant pearl studs are a staple for any jewelry collection. Featuring high-lustre white pearls mounted on sterling silver posts, they offer a touch of classic sophistication to any outfit.",
+        "images": [
+            "pearl_earrings_transparent_1767242450005.png"
+        ],
+        "highlights": [
+            "High-Lustre Freshwater Pearls",
+            "925 Sterling Silver Posts",
+            "Timeless Minimalist Style",
+            "Perfect for Occasions"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "1.5g"
+    },
+    {
+        "id": "brilliant-diamond-pendant",
+        "slug": "brilliant-diamond-pendant",
+        "name": "Brilliant Diamond Pendant",
+        "unitCode": "CHN-006",
+        "category": "chain",
+        "priceLKR": 85000,
+        "image": "diamond_pendant_transparent_1767242465341.png",
+        "shortDescription": "A stunning brilliant-cut diamond pendant on a silver chain.",
+        "description": "Exude luxury with this brilliant-cut diamond pendant. Suspended from a delicate sterling silver chain, the diamond is set to maximize its fire and brilliance, making it a breathtaking focal point.",
+        "images": [
+            "diamond_pendant_transparent_1767242465341.png"
+        ],
+        "highlights": [
+            "0.25 Carat Conflict-Free Diamond",
+            "925 Sterling Silver Chain",
+            "Exceptional Brilliance",
+            "Luxury Presentation Box"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "3g"
+    }
+]
