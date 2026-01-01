@@ -20,37 +20,52 @@ interface ProductCardProps {
     indexY: number;
     totalCols: number;
     totalRows: number;
-    centerX: number;
-    centerY: number;
     isDragging: React.MutableRefObject<boolean>;
 }
 
-const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, centerX, centerY, isDragging }: ProductCardProps) => {
+const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDragging }: ProductCardProps) => {
     const navigate = useNavigate();
+    const width = ITEM_WIDTH;
+    const height = ITEM_HEIGHT;
 
-    // Calculate the absolute position of this card based on the grid offset (x, y)
-    const width = ITEM_WIDTH + GAP;
-    const height = ITEM_HEIGHT + GAP;
-
-    // Base position in the grid
+    // Base position relative to the logical grid center
     const baseX = (indexX - Math.floor(totalCols / 2)) * width;
     const baseY = (indexY - Math.floor(totalRows / 2)) * height;
 
-    // Transformed position (wrapping)
-    const xPos = useTransform(x, (latestX: number) => {
-        const offset = latestX + baseX;
-        const totalWidth = totalCols * width;
-        // Wrap logic:
-        const wrapped = ((offset + totalWidth / 2) % totalWidth + totalWidth) % totalWidth - totalWidth / 2;
-        return wrapped + centerX;
+    // Wrapping logic: based on current offset v
+    const getWrappedValue = (v: number, base: number, total: number) => {
+        const offset = v + base;
+        return ((offset + total / 2) % total + total) % total - total / 2;
+    };
+
+    // Actual Screen Position: Offset (Camera) + Base + Centering math
+    // We use window.innerWidth/Height directly in the transform to ensure it stays anchored to the screen center
+    const xPos = useTransform(x, (v: any) => {
+        const wx = getWrappedValue(Number(v), baseX, totalCols * width);
+        return wx + window.innerWidth / 2 - ITEM_WIDTH / 2;
     });
 
-    const yPos = useTransform(y, (latestY: number) => {
-        const offset = latestY + baseY;
-        const totalHeight = totalRows * height;
-        const wrapped = ((offset + totalHeight / 2) % totalHeight + totalHeight) % totalHeight - totalHeight / 2;
-        return wrapped + centerY;
+    const yPos = useTransform(y, (v: any) => {
+        const wy = getWrappedValue(Number(v), baseY, totalRows * height);
+        return wy + window.innerHeight / 2 - ITEM_HEIGHT / 2;
     });
+
+    // Magnification: based on wrapped distance from center (0,0)
+    // IMPORTANT: The math here (wx, wy) MUST match the xPos/yPos logic exactly
+    const scale = useTransform([x, y], ([vx, vy]: any[]) => {
+        const wx = getWrappedValue(Number(vx), baseX, totalCols * width);
+        const wy = getWrappedValue(Number(vy), baseY, totalRows * height);
+        const distance = Math.sqrt(wx * wx + wy * wy);
+
+        // Focal peak magnification
+        const radius = 500;
+        const norm = Math.min(distance / radius, 1);
+        // Cosine power 6 for a balanced focus (very targeted center product)
+        return 0.5 + 0.5 * Math.pow(Math.cos(norm * (Math.PI / 2)), 6);
+    });
+
+    const opacity = useTransform(scale, [0.5, 1], [0.4, 1]);
+    const zIndex = useTransform(scale, s => Math.round(s * 1000));
 
     const handleClick = (e: React.MouseEvent) => {
         if (isDragging.current) {
@@ -71,40 +86,45 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, cent
                 y: yPos,
                 width: ITEM_WIDTH,
                 height: ITEM_HEIGHT,
-                zIndex: 1,
-                originX: 0.5,
-                originY: 0.5,
+                zIndex,
             }}
-            className="flex flex-col items-center justify-center pointer-events-none border-r border-b border-black/10 bg-[#f5f3ee]"
+            className="flex items-center justify-center pointer-events-none border border-black/[0.04] bg-[#f5f3ee] overflow-hidden"
         >
-            <div
-                onClick={handleClick}
-                className="block w-full h-full p-6 pointer-events-auto cursor-pointer flex flex-col transition-opacity hover:opacity-80"
-                draggable={false}
+            <motion.div
+                style={{
+                    scale,
+                    opacity,
+                    width: "100%",
+                    height: "100%",
+                }}
+                className="flex flex-col items-center justify-center pointer-events-none transform-gpu"
             >
-                {/* Image Container */}
-                <div className="w-full h-[400px] mb-4 overflow-hidden relative flex items-center justify-center bg-black/5">
-                    {product.image ? (
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                            draggable={false}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-black/20 font-mono text-xs">NO IMAGE</div>
-                    )}
-                </div>
-
-                {/* Text Content */}
-                <div className="text-center space-y-2">
-                    <h3 className="font-brand text-sm uppercase tracking-widest">{product.name}</h3>
-                    <div className="flex flex-col items-center gap-1">
-                        <p className="font-mono text-[10px] text-black/50">{product.unitCode}</p>
-                        <p className="font-mono text-xs font-bold">LKR {product.priceLKR.toLocaleString()}</p>
+                <div
+                    onClick={handleClick}
+                    className="block w-full h-full p-12 pointer-events-auto cursor-pointer flex flex-col items-center justify-center transition-opacity hover:opacity-80 appearance-none"
+                    draggable={false}
+                >
+                    <div className="w-full h-[250px] mb-8 overflow-hidden relative flex items-center justify-center bg-black/5">
+                        {product.image ? (
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                                draggable={false}
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-black/20 font-mono text-xs">NO IMAGE</div>
+                        )}
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h3 className="font-brand text-sm uppercase tracking-widest">{product.name}</h3>
+                        <div className="flex flex-col items-center gap-1">
+                            <p className="font-mono text-[10px] text-black/50">{product.unitCode}</p>
+                            <p className="font-mono text-xs font-bold">LKR {product.priceLKR.toLocaleString()}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </motion.div>
     );
 };
@@ -112,57 +132,29 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, cent
 
 export default function Products() {
     const { data: products = [], isLoading } = useProducts();
-    const containerRef = useRef<HTMLDivElement>(null);
     const isDragging = useRef(false);
 
-    // Grid State
-    const [center, setCenter] = useState({ x: 0, y: 0 });
-
-    // Motion Values for the grid offset
+    // Camera offset (Logical pixels relative to central item being at center)
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
-    // Spring physics for snapping
-    const springConfig = { stiffness: 100, damping: 20, mass: 1 };
+    // Spring values for tactical movement
+    const springConfig = { stiffness: 400, damping: 50, mass: 1 };
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
-    useEffect(() => {
-        if (containerRef.current) {
-            setCenter({
-                x: containerRef.current.offsetWidth / 2,
-                y: containerRef.current.offsetHeight / 2,
-            });
-        }
-
-        const handleResize = () => {
-            if (containerRef.current) {
-                setCenter({
-                    x: containerRef.current.offsetWidth / 2,
-                    y: containerRef.current.offsetHeight / 2,
-                });
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    // Prepare grid items
-    const GRID_COLS = 9;
-    const GRID_ROWS = 9;
+    // Grid Scale
+    const GRID_COLS = 7;
+    const GRID_ROWS = 7;
 
     const gridItems = useMemo(() => {
         if (!products.length) return [];
-
         const items = [];
         for (let r = 0; r < GRID_ROWS; r++) {
             for (let c = 0; c < GRID_COLS; c++) {
-                // Map grid position to product index
                 const productIndex = (r * GRID_COLS + c) % products.length;
                 items.push({
                     ...products[productIndex],
-                    gridId: `${r}-${c}`,
                     indexX: c,
                     indexY: r,
                 });
@@ -171,54 +163,42 @@ export default function Products() {
         return items;
     }, [products]);
 
-    const onDragStart = () => {
+    // Stationary container management (Prevents double-drag)
+    const onPanStart = () => {
         isDragging.current = true;
     };
 
-    const onDrag = (event: any, info: PanInfo) => {
-        x.set(x.get() + info.delta.x * DRAG_FACTOR);
-        y.set(y.get() + info.delta.y * DRAG_FACTOR);
+    const onPan = (event: any, info: PanInfo) => {
+        // Direct natural movement (1:1 with cursor)
+        x.set(x.get() + info.delta.x);
+        y.set(y.get() + info.delta.y);
     };
 
-    const onDragEnd = (event: any, info: PanInfo) => {
-        // crucial: short timeout to prevent immediate click firing
-        setTimeout(() => {
-            isDragging.current = false;
-        }, 50);
+    const onPanEnd = (event: any, info: PanInfo) => {
+        setTimeout(() => { isDragging.current = false; }, 50);
 
-        const width = ITEM_WIDTH + GAP;
-        const height = ITEM_HEIGHT + GAP;
+        const width = ITEM_WIDTH;
+        const height = ITEM_HEIGHT;
 
-        // Current values
-        const currentX = x.get();
-        const currentY = y.get();
-
-        // Velocity
+        // Force snap to center based on momentum
         const velX = info.velocity.x;
         const velY = info.velocity.y;
 
-        // Predicted stop point
-        const predictedX = currentX + velX * 0.2;
-        const predictedY = currentY + velY * 0.2;
+        // Predict where it should land and lock to nearest grid cell center
+        const targetX = Math.round((x.get() + velX * 0.1) / width) * width;
+        const targetY = Math.round((y.get() + velY * 0.1) / height) * height;
 
-        // Snap target
-        const snapX = Math.round(predictedX / width) * width;
-        const snapY = Math.round(predictedY / height) * height;
-
-        // Update motion values - the springs will handle the animation
-        x.set(snapX);
-        y.set(snapY);
+        x.set(targetX);
+        y.set(targetY);
     };
 
     return (
         <div className="bg-[#f5f3ee] w-full h-screen overflow-hidden relative font-body selection:bg-black selection:text-white">
-            {/* Background Elements */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-black/5 to-transparent rounded-full blur-[100px] opacity-50" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-gradient-to-tl from-black/5 to-transparent rounded-full blur-[100px] opacity-50" />
+            <div className="absolute inset-0 pointer-events-none opacity-40">
+                <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-black/5 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-black/5 rounded-full blur-[120px]" />
             </div>
 
-            {/* Header / Nav (Absolute) */}
             <div className="absolute top-0 left-0 w-full z-50 p-6 flex justify-between items-start pointer-events-none">
                 <Link to="/" className="text-2xl font-brand tracking-tighter pointer-events-auto">
                     NIRAKARA
@@ -235,16 +215,12 @@ export default function Products() {
                 </div>
             ) : (
                 <motion.div
-                    ref={containerRef}
+                    onPanStart={onPanStart}
+                    onPan={onPan}
+                    onPanEnd={onPanEnd}
                     className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
-                    drag
-                    dragMomentum={false}
-                    onDragStart={onDragStart}
-                    onDrag={onDrag}
-                    onDragEnd={onDragEnd}
-                    style={{ x: 0, y: 0 }}
+                    style={{ x: 0, y: 0 }} // CRITICAL: Stationary parent
                 >
-                    {/* Grid Items */}
                     {gridItems.map((item, i) => (
                         <ProductCard
                             key={i}
@@ -255,18 +231,14 @@ export default function Products() {
                             indexY={item.indexY}
                             totalCols={GRID_COLS}
                             totalRows={GRID_ROWS}
-                            centerX={center.x}
-                            centerY={center.y}
                             isDragging={isDragging}
                         />
                     ))}
                 </motion.div>
             )}
 
-            {/* Instructions */}
-            <div className="absolute bottom-6 left-0 w-full text-center pointer-events-none z-10">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-black/40">Drag to Explore</p>
-            </div>
+            {/* Subtle center marker for UX (optional) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-black/10 rounded-full pointer-events-none" />
         </div>
     );
 }
