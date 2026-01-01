@@ -9,8 +9,8 @@ interface ProductCardProps {
 
 export function ProductCard({ item, product, index }: ProductCardProps) {
   const secondImage = product?.images?.[1] || item.image;
-  const primaryImage = item.image?.startsWith('http') ? item.image : `http://localhost:3001${item.image}`;
-  const secondaryImage = secondImage?.startsWith('http') ? secondImage : `http://localhost:3001${secondImage}`;
+  const primaryImage = item.image;
+  const secondaryImage = secondImage;
 
   return (
     <Link

@@ -86,7 +86,7 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, cent
                 <div className="w-full h-[400px] mb-4 overflow-hidden relative flex items-center justify-center bg-black/5">
                     {product.image ? (
                         <img
-                            src={product.image.startsWith('http') ? product.image : `http://localhost:3001${product.image}`}
+                            src={product.image}
                             alt={product.name}
                             className="w-full h-full object-cover"
                             draggable={false}

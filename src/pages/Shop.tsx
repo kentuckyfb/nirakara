@@ -71,7 +71,7 @@ export default function Shop() {
         code: product.unitCode,
         name: product.name,
         description: product.shortDescription,
-        image: product.image?.startsWith('http') ? product.image : `http://localhost:3001${product.image}`,
+        image: product.image,
         slug: product.slug,
         category: product.category,
       }));
