@@ -1,81 +1,142 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import { motion, useMotionValue, useSpring, PanInfo, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, PanInfo, useTransform, AnimatePresence } from "framer-motion";
 import { useProducts } from "@/hooks/useProducts";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Product } from "@/types/product";
 
 // --- Configuration ---
-const ITEM_WIDTH = 300;
-const ITEM_HEIGHT = 350;
-const GAP = 0; // No gap for continuous grid lines
-const DRAG_FACTOR = 1; // 1:1 movement for tactile feel
+const ITEM_WIDTH = 220;
+const ITEM_HEIGHT = 288;
+const GAP = 50; // Slightly more spacing between cards
+const DRAG_FACTOR = 1;
 
 // --- Components ---
 
 interface ProductCardProps {
     product: Product;
-    x: any; // MotionValue
-    y: any; // MotionValue
+    x: any;
+    y: any;
     indexX: number;
     indexY: number;
     totalCols: number;
     totalRows: number;
     isDragging: React.MutableRefObject<boolean>;
+    isMobile: boolean;
 }
 
-const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDragging }: ProductCardProps) => {
+const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDragging, isMobile }: ProductCardProps) => {
     const navigate = useNavigate();
     const width = ITEM_WIDTH;
     const height = ITEM_HEIGHT;
+    const currentGap = GAP;
 
-    const baseX = (indexX - Math.floor(totalCols / 2)) * width;
-    const baseY = (indexY - Math.floor(totalRows / 2)) * height;
+    const baseX = (indexX - Math.floor(totalCols / 2)) * (width + currentGap);
+    const baseY = (indexY - Math.floor(totalRows / 2)) * (height + currentGap);
+
+    const sphereRadius = isMobile ? 720 : 1100;
+    const tiltScale = isMobile ? 0.9 : 0.78;
+    const twistMax = isMobile ? 2.5 : 4.5;
+    const depthScale = isMobile ? 420 : 900;
+    const focusTightness = isMobile ? 3.0 : 3.6;
+    const fisheyeK = isMobile ? 0.14 : 0.16;
 
     const getWrappedValue = (v: number, base: number, total: number) => {
         const offset = v + base;
         return ((offset + total / 2) % total + total) % total - total / 2;
     };
 
-    const xPos = useTransform(x, (v: any) => {
-        const wx = getWrappedValue(Number(v), baseX, totalCols * width);
-        return wx + window.innerWidth / 2 - ITEM_WIDTH / 2;
+    const applyFisheye = (wx: number, wy: number) => {
+        const r = Math.sqrt(wx * wx + wy * wy);
+        const R = sphereRadius * 1.05;
+        const t = Math.min(r / R, 1);
+        const factor = 1 + fisheyeK * (1 - t * t); // magnify center, keep edges tighter
+        return {
+            fx: wx * factor,
+            fy: wy * factor,
+            r,
+            factor
+        };
+    };
+
+    const getSphereMetrics = (vx: number, vy: number) => {
+        const wx = getWrappedValue(Number(vx), baseX, totalCols * (width + currentGap));
+        const wy = getWrappedValue(Number(vy), baseY, totalRows * (height + currentGap));
+        const { fx, fy } = applyFisheye(wx, wy);
+
+        const distance2D = Math.sqrt(fx * fx + fy * fy) || 1;
+        const clampFactor = Math.min(distance2D, sphereRadius * 0.998) / distance2D;
+        const sx = fx * clampFactor;
+        const sy = fy * clampFactor;
+
+        const zSurface = Math.sqrt(Math.max(sphereRadius * sphereRadius - sx * sx - sy * sy, 0));
+
+        const diag = (Math.abs(sx) / sphereRadius) * (Math.abs(sy) / sphereRadius);
+        const tiltBoost = 1 + diag * 0.12;
+        const depthBoost = 1 + diag * 0.25;
+
+        const tiltY = ((Math.atan2(sx, zSurface) * 180) / Math.PI) * tiltBoost * tiltScale;    // yaw outward from center
+        const tiltX = ((-Math.atan2(sy, zSurface) * 180) / Math.PI) * tiltBoost * tiltScale;   // pitch outward from center
+
+        const twist = ((sx * sy) / (sphereRadius * sphereRadius)) * twistMax;
+        const zOffset = (zSurface - sphereRadius) * depthBoost; // 0 at center, negative as it arcs away
+
+        const focus = Math.pow(zSurface / sphereRadius, focusTightness);
+
+        return { tiltX, tiltY, twist, zOffset, distance2D, focus };
+    };
+
+    const xPos = useTransform([x, y], ([vx, vy]: any[]) => {
+        const wx = getWrappedValue(Number(vx), baseX, totalCols * (width + currentGap));
+        const wy = getWrappedValue(Number(vy), baseY, totalRows * (height + currentGap));
+        const { fx } = applyFisheye(wx, wy);
+        return fx + window.innerWidth / 2 - width / 2;
     });
 
-    const yPos = useTransform(y, (v: any) => {
-        const wy = getWrappedValue(Number(v), baseY, totalRows * height);
-        return wy + window.innerHeight / 2 - ITEM_HEIGHT / 2;
+    const yPos = useTransform([x, y], ([vx, vy]: any[]) => {
+        const wx = getWrappedValue(Number(vx), baseX, totalCols * (width + currentGap));
+        const wy = getWrappedValue(Number(vy), baseY, totalRows * (height + currentGap));
+        const { fy } = applyFisheye(wx, wy);
+        return fy + window.innerHeight / 2 - height / 2;
     });
 
-    // 3D Perspective Rotation based on distance from focal point
-    const rotateX = useTransform(y, (v: any) => {
-        const wy = getWrappedValue(Number(v), baseY, totalRows * height);
-        return (wy / 1000) * 15; // Subtle tilt based on vertical distance
+    const rotateY = useTransform([x, y], ([vx, vy]: any[]) => {
+        const { tiltY } = getSphereMetrics(vx, vy);
+        return tiltY;
     });
 
-    const rotateY = useTransform(x, (v: any) => {
-        const wx = getWrappedValue(Number(v), baseX, totalCols * width);
-        return -(wx / 1000) * 15; // Subtle tilt based on horizontal distance
+    const rotateX = useTransform([x, y], ([vx, vy]: any[]) => {
+        const { tiltX } = getSphereMetrics(vx, vy);
+        return tiltX;
     });
 
+    const rotateZ = useTransform([x, y], ([vx, vy]: any[]) => {
+        const { twist } = getSphereMetrics(vx, vy);
+        return twist;
+    });
+
+    const zPos = useTransform([x, y], ([vx, vy]: any[]) => {
+        const { zOffset } = getSphereMetrics(vx, vy);
+        return zOffset * depthScale;
+    });
+
+    // Slightly enlarge the center card; gently shrink distant cards for depth while keeping spacing anchors.
     const scale = useTransform([x, y], ([vx, vy]: any[]) => {
-        const wx = getWrappedValue(Number(vx), baseX, totalCols * width);
-        const wy = getWrappedValue(Number(vy), baseY, totalRows * height);
+        const { distance2D } = getSphereMetrics(vx, vy);
+        const bumpRadius = sphereRadius * 0.4;
+        const t = Math.max(0, 1 - distance2D / bumpRadius);
+        const centerBump = 0.28 * Math.pow(t, 1.2); // larger center card
 
-        // Normalize distance: Treat width and height steps as equal units
-        // Since height (350) is greater than width (300), we scale wy down 
-        // to match the horizontal magnification rate.
-        const wyNormalized = wy * (ITEM_WIDTH / ITEM_HEIGHT);
-        const distance = Math.sqrt(wx * wx + wyNormalized * wyNormalized);
+        const norm = Math.min(distance2D / (sphereRadius * 1.05), 1);
+        const depthFalloff = 0.06 * norm;
 
-        const radius = 750;
-        const norm = Math.min(distance / radius, 1);
-        return 0.5 + 0.5 * Math.pow(Math.cos(norm * (Math.PI / 2)), 3.5);
+        return Math.max(0.92, 1 - depthFalloff + centerBump);
     });
 
-    const opacity = useTransform(scale, [0.5, 1], [0.6, 1]);
-    const zIndex = useTransform(scale, s => Math.round(s * 1000));
-
-    const detailsOpacity = useTransform(scale, [0.5, 0.8], [0.3, 1]);
+    const opacity = 1;
+    const zIndex = useTransform([x, y], ([vx, vy]: any[]) => {
+        const { zOffset } = getSphereMetrics(vx, vy);
+        return Math.round(1000 + zOffset * 10);
+    });
 
     const handleClick = (e: React.MouseEvent) => {
         if (isDragging.current) {
@@ -86,11 +147,6 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDr
         navigate(`/product/${product.slug}`);
     };
 
-    // Generate semi-stable archival metadata based on index
-    const serialNumber = useMemo(() => `NIR-${(indexX + indexY * totalCols).toString().padStart(4, '0')}`, [indexX, indexY, totalCols]);
-    const sector = useMemo(() => `SECTOR_${Math.floor(indexX / 3)}:ARCHIVE_${String.fromCharCode(65 + Math.floor(indexY / 3))}`, [indexX, indexY]);
-    const materialCode = useMemo(() => ['MTL-01', 'MTL-02', 'MTL-03', 'TEX-08', 'GLS-11'][(indexX + indexY) % 5], [indexX, indexY]);
-
     return (
         <motion.div
             style={{
@@ -99,70 +155,62 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDr
                 top: 0,
                 x: xPos,
                 y: yPos,
-                width: ITEM_WIDTH,
-                height: ITEM_HEIGHT,
+                z: zPos,
+                rotateX,
+                rotateY,
+                rotateZ,
+                width: width,
+                height: height,
                 zIndex,
-                perspective: 1000,
+                scale,
+                opacity: 1,
+                transformStyle: "preserve-3d"
             }}
             className="flex items-center justify-center pointer-events-none p-4"
         >
             <motion.div
-                style={{
-                    scale,
-                    opacity,
-                    rotateX,
-                    rotateY,
-                    width: "100%",
-                    height: "100%",
-                }}
-                className="flex flex-col items-center justify-center pointer-events-none transform-gpu bg-white/40 backdrop-blur-xl border-[0.5px] border-black/10 rounded-sm overflow-hidden group/card"
+                style={{ opacity: 1 }}
+                className="w-full h-full flex flex-col pointer-events-none bg-white border border-black/10 overflow-hidden relative shadow-sm"
             >
                 <div
                     onClick={handleClick}
-                    className="block w-full h-full p-6 pointer-events-auto cursor-pointer flex flex-col items-center justify-between transition-colors duration-500 hover:bg-black/[0.02] active:bg-black/[0.04] appearance-none"
+                    className="block w-full h-full px-6 pb-6 pt-5 pointer-events-auto cursor-pointer flex flex-col gap-3 transition-colors duration-300 hover:bg-black/[0.006] appearance-none"
                     draggable={false}
                 >
-                    {/* Top Archival Header */}
-                    <motion.div style={{ opacity: detailsOpacity }} className="w-full flex justify-between items-start font-mono text-[7px] uppercase tracking-widest text-black/40">
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-black/60 font-bold">{serialNumber}</span>
-                            <span>{sector}</span>
-                        </div>
-                        <div className="text-right flex flex-col gap-0.5">
-                            <span className="italic">{product.category || "SPECIMEN"}</span>
-                            <span>{materialCode}</span>
-                        </div>
-                    </motion.div>
+                    {/* Title */}
+                    <h3
+                        className="font-brand text-[10px] uppercase tracking-tight text-black font-semibold"
+                        style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                        }}
+                        title={product.name}
+                    >
+                        {product.name}
+                    </h3>
 
-                    {/* Image Section */}
-                    <div className="w-full h-[150px] relative flex items-center justify-center">
-                        {/* Internal Scanlines for images */}
-                        <div className="absolute inset-0 z-10 opacity-[0.03] pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
-
+                    {/* Image */}
+                    <div className="w-full h-[190px] relative flex items-center justify-center bg-white overflow-hidden">
                         {product.image ? (
                             <img
                                 src={product.image}
                                 alt={product.name}
-                                className="h-full w-auto object-contain transition-transform duration-700 group-hover/card:scale-105"
+                                className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
                                 draggable={false}
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-black/10 font-mono text-[8px]">IMAGE_NOT_SYNCED</div>
+                            <div className="text-black/30 font-mono text-[10px] uppercase tracking-[0.2em]">Image pending</div>
                         )}
                     </div>
 
-                    {/* Lower Editorial Content */}
-                    <div className="w-full pt-4 border-t border-black/5 flex justify-between items-end">
-                        <div className="flex flex-col gap-1 max-w-[70%] text-left">
-                            <h3 className="font-brand text-[10px] uppercase tracking-[0.2em] leading-tight text-black/80 line-clamp-1">{product.name}</h3>
-                            <div className="flex gap-2 font-mono text-[7px] text-black/30">
-                                <span>BATCH_{product.id.substring(0, 4)}</span>
-                                <span className="text-emerald-500/40">● VERIFIED</span>
-                            </div>
+                    {/* Info */}
+                    <div className="w-full mt-auto space-y-1">
+                        <div className="w-full flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.18em] text-black/50">
+                            <span className="truncate">{product.category}</span>
+                            <span className="text-black/35">Lot</span>
                         </div>
-                        <div className="text-right">
-                            <p className="font-mono text-[9px] font-bold text-black/90 tabular-nums">LKR {product.priceLKR.toLocaleString()}</p>
-                        </div>
+                        <p className="font-mono text-[11px] font-semibold text-black/70 tabular-nums">LKR {product.priceLKR.toLocaleString()}</p>
                     </div>
                 </div>
             </motion.div>
@@ -173,92 +221,164 @@ const ProductCard = ({ product, x, y, indexX, indexY, totalCols, totalRows, isDr
 export default function Products() {
     const { data: products = [], isLoading } = useProducts();
     const isDragging = useRef(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
-    // Mouse Tracking for Cursor-HUD
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+    type Filters = {
+        categories: string[];
+        finishes: string[];
+        maxPrice: number | null;
+        featuredOnly: boolean;
+    };
+
+    const categoryOptions = useMemo(() => ["ring", "chain", "bracelet", "ear-cuff"], []);
+
+    const priceStats = useMemo(() => {
+        if (!products.length) return { min: 0, max: 0 };
+        const visible = products.filter((p) => p.isVisible !== false);
+        if (!visible.length) return { min: 0, max: 0 };
+        const prices = visible.map((p) => p.priceLKR);
+        return {
+            min: Math.min(...prices),
+            max: Math.max(...prices),
+        };
+    }, [products]);
+
+    const availableFinishes = useMemo(() => {
+        const finishes = new Set<string>();
+        products.forEach((p) => {
+            if (p.finish) finishes.add(p.finish);
+        });
+        return Array.from(finishes);
+    }, [products]);
+
+    const parseInitialFilters = (): Filters => {
+        const catParams = searchParams.getAll("category").filter(Boolean);
+        const finishParams = searchParams.getAll("finish").filter(Boolean);
+        const priceParam = Number(searchParams.get("priceMax"));
+        const featuredParam = searchParams.get("featured");
+
+        return {
+            categories: catParams.length ? catParams : [],
+            finishes: finishParams.length ? finishParams : [],
+            maxPrice: Number.isFinite(priceParam) && priceParam > 0 ? priceParam : null,
+            featuredOnly: featuredParam === "1",
+        };
+    };
+
+    const [filters, setFilters] = useState<Filters>(parseInitialFilters);
+
+    // Hydrate max price once products load so slider has a bound even without URL param
+    useEffect(() => {
+        if (!priceStats.max) return;
+        setFilters((prev) => ({
+            ...prev,
+            maxPrice: prev.maxPrice ?? priceStats.max,
+        }));
+    }, [priceStats.max]);
+
+    // Keep query string in sync with current filters for shareable URLs
+    useEffect(() => {
+        if (!priceStats.max) return;
+        const params = new URLSearchParams();
+        filters.categories.forEach((cat) => params.append("category", cat));
+        filters.finishes.forEach((fin) => params.append("finish", fin));
+        if (filters.maxPrice && filters.maxPrice < priceStats.max) {
+            params.set("priceMax", String(Math.round(filters.maxPrice)));
+        }
+        if (filters.featuredOnly) {
+            params.set("featured", "1");
+        }
+        setSearchParams(params, { replace: true });
+    }, [filters, priceStats.max, setSearchParams]);
+
+    const toggleCategory = (cat: string) => {
+        setFilters((prev) => {
+            const exists = prev.categories.includes(cat);
+            return {
+                ...prev,
+                categories: exists ? prev.categories.filter((c) => c !== cat) : [...prev.categories, cat],
+            };
+        });
+    };
+
+    const toggleFinish = (finish: string) => {
+        setFilters((prev) => {
+            const exists = prev.finishes.includes(finish);
+            return {
+                ...prev,
+                finishes: exists ? prev.finishes.filter((f) => f !== finish) : [...prev.finishes, finish],
+            };
+        });
+    };
+
+    const updatePrice = (value: number) => {
+        setFilters((prev) => ({
+            ...prev,
+            maxPrice: Math.max(priceStats.min, Math.min(value, priceStats.max)),
+        }));
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            categories: [],
+            finishes: [],
+            maxPrice: priceStats.max || null,
+            featuredOnly: false,
+        });
+    };
+
+    const priceMaxValue = filters.maxPrice ?? priceStats.max;
+    const pricePercent = priceStats.max > priceStats.min
+        ? ((priceMaxValue - priceStats.min) / (priceStats.max - priceStats.min)) * 100
+        : 100;
+
+    const filteredProducts = useMemo(() => {
+        if (!products.length) return [];
+        return products.filter((p: Product) => {
+            if (p.isVisible === false) return false;
+            if (filters.categories.length && !filters.categories.includes(p.category)) return false;
+            if (filters.finishes.length && (!p.finish || !filters.finishes.includes(p.finish))) return false;
+            if (filters.featuredOnly && !p.isFeatured) return false;
+            if (filters.maxPrice && p.priceLKR > filters.maxPrice) return false;
+            return true;
+        });
+    }, [products, filters]);
 
     const springConfig = { stiffness: 400, damping: 50, mass: 1 };
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
-    const smoothMouseX = useSpring(mouseX, { stiffness: 1000, damping: 50 });
-    const smoothMouseY = useSpring(mouseY, { stiffness: 1000, damping: 50 });
-
     const GRID_COLS = 11;
     const GRID_ROWS = 11;
 
-    // Background lighting parallax
-    const bgX = useTransform(springX, v => (Number(v) * 0.05));
-    const bgY = useTransform(springY, v => (Number(v) * 0.05));
-
-    // Archival Coordinates
-    const currentX = useTransform(x, v => Math.abs(Math.round(Number(v) / ITEM_WIDTH) % 100).toString().padStart(2, '0'));
-    const currentY = useTransform(y, v => Math.abs(Math.round(Number(v) / ITEM_HEIGHT) % 100).toString().padStart(2, '0'));
-
-    const [dispX, setDispX] = useState("00");
-    const [dispY, setDispY] = useState("00");
-
+    const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
-        const unsubX = currentX.on("change", (v) => setDispX(v));
-        const unsubY = currentY.on("change", (v) => setDispY(v));
-        return () => { unsubX(); unsubY(); };
-    }, [currentX, currentY]);
-
-    // Stable Technical IDs for HUD
-    const sessionId = useMemo(() => Math.random().toString(36).substring(7).toUpperCase(), []);
-    const refId = useMemo(() => Math.random().toString(36).substring(2, 8).toUpperCase(), []);
-
-    // Reactive Depth Telemetry
-    const depth = useTransform([springX, springY], ([sx, sy]: any[]) => {
-        // Find distance to center from current smoothed position
-        const dx = Number(sx) % ITEM_WIDTH;
-        const dy = Number(sy) % ITEM_HEIGHT;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const norm = Math.max(0, 1 - dist / 500);
-        return (norm * 100).toFixed(1);
-    });
-
-    const [dispDepth, setDispDepth] = useState("00.0");
-    useEffect(() => {
-        const unsub = depth.on("change", setDispDepth);
-        return unsub;
-    }, [depth]);
-
-    // Archive Scan Transition on load
-    const [isBooting, setIsBooting] = useState(true);
-    useEffect(() => {
-        if (!isLoading) {
-            setTimeout(() => setIsBooting(false), 800);
-        }
-    }, [isLoading]);
-
-    // Focal check for cursor label: Show when mouse is near screen center
-    const showLabel = useTransform([mouseX, mouseY], ([mx, my]: any[]) => {
-        const dx = Number(mx) - window.innerWidth / 2;
-        const dy = Number(my) - window.innerHeight / 2;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        return dist < 300 ? 1 : 0;
-    });
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const gridItems = useMemo(() => {
-        if (!products.length) return [];
+        if (!filteredProducts.length) return [];
         const items = [];
         for (let r = 0; r < GRID_ROWS; r++) {
             for (let c = 0; c < GRID_COLS; c++) {
-                const productIndex = (r * GRID_COLS + c) % products.length;
+                const productIndex = (r * GRID_COLS + c) % filteredProducts.length;
                 items.push({
-                    ...products[productIndex],
+                    ...filteredProducts[productIndex],
                     indexX: c,
                     indexY: r,
                 });
             }
         }
         return items;
-    }, [products]);
+    }, [filteredProducts]);
 
     const onPanStart = () => { isDragging.current = true; };
     const onPan = (event: any, info: PanInfo) => {
@@ -267,85 +387,86 @@ export default function Products() {
     };
     const onPanEnd = (event: any, info: PanInfo) => {
         setTimeout(() => { isDragging.current = false; }, 50);
-        const width = ITEM_WIDTH;
-        const height = ITEM_HEIGHT;
+        const distX = ITEM_WIDTH + GAP;
+        const distY = ITEM_HEIGHT + GAP;
         const velX = info.velocity.x;
         const velY = info.velocity.y;
-        const targetX = Math.round((x.get() + velX * 0.1) / width) * width;
-        const targetY = Math.round((y.get() + velY * 0.1) / height) * height;
+
+        // Snapping with slightly more momentum for tactile feel
+        const targetX = Math.round((x.get() + velX * 0.15) / distX) * distX;
+        const targetY = Math.round((y.get() + velY * 0.15) / distY) * distY;
+
         x.set(targetX);
         y.set(targetY);
     };
 
-    const handleMouseMove = (e: React.MouseEvent) => {
-        mouseX.set(e.clientX);
-        mouseY.set(e.clientY);
-    };
+    const topButtonClass = "transition-opacity flex items-center gap-2 px-3 py-2 border border-black/25 bg-white/85 shadow-sm rounded-none w-[150px]";
 
     return (
-        <div
-            onMouseMove={handleMouseMove}
-            className="bg-[#f5f3ee] w-full h-screen overflow-hidden relative font-body selection:bg-none select-none"
-        >
-            {/* --- WORLD LAYER (Background & Grid) --- */}
-            <div className="absolute inset-0 z-0">
+        <div className="bg-[#f7f5ef] w-full h-screen overflow-hidden relative font-body selection:bg-none select-none">
+            {/* --- WORLD LAYER --- */}
+            <div
+                className="absolute inset-0 z-0"
+                style={{ perspective: isMobile ? "1200px" : "1700px", perspectiveOrigin: "50% 50%" }}
+            >
                 <motion.div
-                    className="absolute inset-[-10%] opacity-[0.4]"
+                    className="absolute inset-[-18%] opacity-[0.8]"
                     style={{
-                        x: bgX,
-                        y: bgY,
-                        backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)',
-                        backgroundSize: '40px 40px'
+                        x: useTransform(springX, v => Number(v) * 0.018),
+                        y: useTransform(springY, v => Number(v) * 0.018),
+                        backgroundImage: `
+                            radial-gradient(circle at 22% 28%, rgba(0,0,0,0.08) 0 140px, transparent 230px),
+                            radial-gradient(circle at 78% 68%, rgba(0,0,0,0.07) 0 180px, transparent 280px),
+                            radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0 220px, transparent 340px),
+                            radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px),
+                            linear-gradient(135deg, #f9f4e8 0%, #f2eadc 40%, #ede3d2 100%)
+                        `,
+                        backgroundSize: 'auto, auto, auto, 18px 18px, cover',
+                        filter: 'contrast(1.05) saturate(1.02)'
                     }}
                 />
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+
+                {/* Slow trail layer for subtle motion */}
+                <motion.div
+                    className="absolute inset-[-20%] opacity-[0.12] pointer-events-none"
+                    style={{
+                        x: useTransform(springX, v => Number(v) * 0.01),
+                        y: useTransform(springY, v => Number(v) * 0.01),
+                        backgroundImage: `
+                            repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 120px),
+                            repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 120px)
+                        `,
+                        backgroundSize: '140px 140px, 140px 140px',
+                        filter: 'blur(0.6px)'
+                    }}
                 />
-                <motion.div style={{ x: useTransform(bgX, v => Number(v) * 0.7), y: useTransform(bgY, v => Number(v) * 0.7) }} className="absolute inset-0 pointer-events-none opacity-40">
-                    <div className="absolute top-[-20%] left-[-20%] w-[1000px] h-[1000px] bg-black/[0.03] rounded-full blur-[180px]" />
-                    <div className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] bg-black/[0.03] rounded-full blur-[160px]" />
-                </motion.div>
 
-                {isBooting && (
-                    <motion.div
-                        initial={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 1 }}
-                        className="absolute inset-0 z-[5000] bg-[#f5f3ee] flex flex-col items-center justify-center p-12 pointer-events-none"
-                    >
-                        <div className="w-full max-w-md space-y-8">
-                            <div className="flex justify-between font-mono text-[9px] text-black/40 tracking-[0.3em]">
-                                <span>ARCHIVAL_RECOVERY_PROTOCOL</span>
-                                <motion.span animate={{ opacity: [0, 1] }} transition={{ repeat: Infinity }}>[LOADING]</motion.span>
-                            </div>
-                            <div className="h-[1px] w-full bg-black/5 relative overflow-hidden">
-                                <motion.div
-                                    initial={{ x: "-100%" }}
-                                    animate={{ x: "0%" }}
-                                    transition={{ duration: 0.8, ease: "circOut" }}
-                                    className="absolute inset-0 bg-black/40"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-12 font-mono text-[7px] text-black/20 text-center">
-                                <span>STREAMING_PIXELS_B01</span>
-                                <span>SYNC_V_SYNC_AUTO</span>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
+                {/* Subtle grain that drifts with motion, stays behind cards */}
+                <motion.div
+                    className="absolute inset-[-22%] opacity-[0.05] mix-blend-multiply pointer-events-none"
+                    style={{
+                        x: useTransform(springX, v => Number(v) * -0.004),
+                        y: useTransform(springY, v => Number(v) * -0.004),
+                        backgroundImage: `
+                            repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px),
+                            repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px)
+                        `,
+                        backgroundSize: '160px 160px, 180px 180px',
+                        filter: 'blur(0.25px)'
+                    }}
+                />
 
-                {!isBooting && (
-                    isLoading ? (
-                        <div className="flex items-center justify-center h-full">
-                            <div className="w-2 h-2 bg-black animate-pulse" />
-                        </div>
-                    ) : (
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                        <div className="w-1.5 h-1.5 bg-black rounded-full animate-ping" />
+                    </div>
+                ) : (
+                    <div className="relative z-20">
                         <motion.div
                             onPanStart={onPanStart}
                             onPan={onPan}
                             onPanEnd={onPanEnd}
-                            className="w-full h-full cursor-none touch-none"
-                            style={{ x: 0, y: 0 }}
+                            className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
                         >
                             {gridItems.map((item, i) => (
                                 <ProductCard
@@ -358,108 +479,190 @@ export default function Products() {
                                     totalCols={GRID_COLS}
                                     totalRows={GRID_ROWS}
                                     isDragging={isDragging}
+                                    isMobile={isMobile}
                                 />
                             ))}
                         </motion.div>
-                    )
+                    </div>
                 )}
-
-                {/* Center Crosshair (World Space) */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-20">
-                    <div className="w-10 h-[1px] bg-black/40 absolute -translate-x-1/2" />
-                    <div className="h-10 w-[1px] bg-black/40 absolute -translate-y-1/2" />
-                </div>
             </div>
 
-            {/* --- LENS / BLUR LAYER --- */}
-            <div className="absolute inset-0 z-[10] pointer-events-none overflow-hidden">
+            {/* --- LENS --- */}
+            <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
                 <div
-                    className="absolute inset-0 backdrop-blur-[12px] bg-white/[0.02]"
+                    className="absolute inset-0 backdrop-blur-[18px]"
                     style={{
-                        maskImage: 'radial-gradient(circle at center, transparent 30%, black 85%)',
-                        WebkitMaskImage: 'radial-gradient(circle at center, transparent 30%, black 85%)',
+                        maskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
+                        WebkitMaskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
                     }}
                 />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.12)_100%)]" />
-                <div className="absolute inset-0 opacity-[0.04]">
-                    <motion.div
-                        initial={{ y: "-100%" }}
-                        animate={{ y: "200%" }}
-                        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                        className="w-full h-[40%] bg-gradient-to-b from-transparent via-black to-transparent"
-                    />
-                </div>
             </div>
 
-            {/* --- HUD/GUI LAYER --- */}
-            <div className="absolute inset-0 z-[1000] pointer-events-none flex flex-col justify-between p-8">
-                <div className="absolute top-4 left-4 w-12 h-12 border-t border-l border-black/10" />
-                <div className="absolute top-4 right-4 w-12 h-12 border-t border-r border-black/10" />
-                <div className="absolute bottom-4 left-4 w-12 h-12 border-b border-l border-black/10" />
-                <div className="absolute bottom-4 right-4 w-12 h-12 border-b border-r border-black/10" />
-
-                <div className="flex justify-between items-start">
-                    <div className="pointer-events-auto">
-                        <Link to="/" className="text-2xl font-brand tracking-tighter block hover:opacity-50 transition-opacity">NIRAKARA</Link>
-                        <div className="mt-1 h-[1px] w-full bg-black/10 origin-left scale-x-50" />
-                        <div className="mt-2 font-mono text-[7px] uppercase tracking-[0.4em] text-black/20 flex items-center gap-2">
-                            <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="w-1.5 h-1.5 border border-black/40 border-t-transparent rounded-full" />
-                            ARCHIVAL_ACTIVE_STREAM
-                        </div>
-                    </div>
-                    <div className="flex gap-12 font-mono text-[9px] uppercase tracking-[0.4em] pointer-events-auto items-center">
-                        <Link to="/shop" className="hover:line-through transition-all opacity-40 hover:opacity-100 italic">Archive_List</Link>
-                        <Link to="/cart" className="hover:line-through transition-all opacity-40 hover:opacity-100">User_Cart [0]</Link>
-                        <div className="w-8 h-8 border border-black/10 flex items-center justify-center relative group">
-                            <div className="absolute inset-0 bg-black/5 scale-0 group-hover:scale-100 transition-transform" />
-                            <span className="relative">?</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex justify-between items-end">
-                    <div className="flex flex-col gap-1 font-mono text-[9px] uppercase tracking-[0.25em] text-black/40">
-                        <div className="text-[7px] text-black/20 flex gap-4 mb-1">
-                            <span>GRID_STATUS: ACTIVE</span>
-                            <span>Z_DEPTH: {dispDepth}%</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <span className="text-black/10 font-bold">POS_FEED</span>
-                            <span className="text-black/80 font-bold tabular-nums flex gap-3">
-                                <div className="flex items-center gap-1 min-w-[40px]"><span className="text-[7px] text-black/20">X_</span><span>{dispX}</span></div>
-                                <span className="text-black/10">/</span>
-                                <div className="flex items-center gap-1 min-w-[40px]"><span className="text-[7px] text-black/20">Y_</span><span>{dispY}</span></div>
+            {/* --- MINIMAL UI --- */}
+            <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col justify-between px-4 md:px-10 py-6 md:py-8">
+                <div className="flex justify-between items-start gap-4">
+                    <Link to="/" className="pointer-events-auto text-[24px] md:text-[28px] font-brand tracking-tight block hover:opacity-70 transition-opacity">
+                        NIRAKARA
+                    </Link>
+                    <div className="pointer-events-auto flex items-center gap-3 md:gap-6 font-mono text-[10px] uppercase tracking-[0.25em] text-black/70">
+                        <button
+                            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                            className={`${topButtonClass} ${isFiltersOpen ? 'opacity-100' : 'opacity-85 hover:opacity-100'} justify-between`}
+                        >
+                            <span>Filters</span>
+                            <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-none border border-black/25 px-1 text-[9px] font-semibold text-black">
+                                {[
+                                    filters.categories.length,
+                                    filters.finishes.length,
+                                    filters.featuredOnly ? 1 : 0,
+                                    filters.maxPrice && priceStats.max && filters.maxPrice < priceStats.max ? 1 : 0,
+                                ].reduce((a, b) => a + b, 0)}
                             </span>
-                        </div>
-                        <div className="h-[2px] w-64 bg-black/5 relative overflow-hidden backdrop-blur-sm">
-                            <motion.div style={{ x: useTransform(x, v => (Number(v) % 100) * 0.5) }} className="absolute inset-0 w-1/4 bg-black/60" />
-                        </div>
-                    </div>
-                    <div className="font-mono text-[8px] uppercase tracking-[0.5em] text-black/20 text-right flex flex-col gap-1 items-end">
-                        <div className="flex items-center gap-2 mt-auto">
-                            <span className="h-[1px] w-8 bg-black/10" />
-                            SESSION: {sessionId} // REF_{refId}
-                        </div>
-                        <div className="text-emerald-500/40 text-[7px] font-bold tracking-[0.2em]">STATUS: LENS_CALIBRATED_EST</div>
+                        </button>
+                        <Link
+                            to="/cart"
+                            className={`${topButtonClass} opacity-85 hover:opacity-100 whitespace-nowrap justify-between flex`}
+                        >
+                            <span>Cart</span>
+                            <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-none border border-black/25 px-1 text-[9px] font-semibold text-black/70 opacity-70">
+                                0
+                            </span>
+                        </Link>
                     </div>
                 </div>
-            </div>
 
-            {/* --- CURSOR LAYER --- */}
-            <motion.div
-                style={{ x: smoothMouseX, y: smoothMouseY }}
-                className="fixed top-0 left-0 z-[10000] pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
-            >
-                <div className="relative flex items-center justify-center">
-                    <div className="w-2 h-2 bg-black rounded-full" />
-                    <motion.div
-                        style={{ opacity: showLabel }}
-                        className="absolute left-6 whitespace-nowrap bg-black text-white px-3 py-1 text-[8px] font-brand uppercase tracking-[0.3em] backdrop-blur-md"
-                    >
-                        View Piece
-                    </motion.div>
-                </div>
-            </motion.div>
+                <AnimatePresence>
+                    {isFiltersOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.18 }}
+                            className="pointer-events-auto absolute top-20 right-0 md:right-10 px-4 md:px-0 w-full md:w-auto"
+                        >
+                            <div className="mx-auto md:ml-auto md:mr-0 w-full md:w-[380px] bg-white/95 backdrop-blur border border-black/30 shadow-2xl rounded-none p-5 flex flex-col gap-5">
+                                <div className="flex items-center justify-between">
+                                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-black">Filters</span>
+                                    <button
+                                        onClick={clearFilters}
+                                        className="text-[10px] font-mono uppercase tracking-[0.2em] text-black hover:underline underline-offset-4"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[11px] font-semibold text-black/70 uppercase tracking-[0.18em]">Categories</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {categoryOptions.map((cat) => {
+                                            const active = filters.categories.includes(cat);
+                                            return (
+                                                <button
+                                                    key={cat}
+                                                    onClick={() => toggleCategory(cat)}
+                                                    className={`px-3 py-2 border text-[10px] uppercase tracking-[0.18em] transition-colors ${
+                                                        active
+                                                            ? "border-black bg-black text-white shadow-sm"
+                                                            : "border-black/25 text-black/70 hover:border-black/40 hover:text-black"
+                                                    }`}
+                                                >
+                                                    {cat}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {availableFinishes.length > 0 && (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-semibold text-black/70 uppercase tracking-[0.18em]">Finish</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {availableFinishes.map((finish) => {
+                                                const active = filters.finishes.includes(finish);
+                                                return (
+                                                    <button
+                                                        key={finish}
+                                                        onClick={() => toggleFinish(finish)}
+                                                        className={`px-3 py-2 border text-[10px] uppercase tracking-[0.18em] transition-colors ${
+                                                            active
+                                                                ? "border-black bg-black text-white shadow-sm"
+                                                                : "border-black/25 text-black/70 hover:border-black/40 hover:text-black"
+                                                        }`}
+                                                    >
+                                                        {finish}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {priceStats.max > 0 && (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-semibold text-black/70 uppercase tracking-[0.18em]">Price cap</span>
+                                            <div className="flex items-center gap-2 text-[11px] text-black/80 font-mono">
+                                                <span className="uppercase tracking-[0.18em] text-black/60">Up to</span>
+                                                <input
+                                                    type="number"
+                                                    className="w-24 border border-black/25 px-2 py-1 text-[11px] bg-white focus:border-black/50 focus:outline-none rounded-none"
+                                                    value={priceMaxValue}
+                                                    min={priceStats.min}
+                                                    max={priceStats.max}
+                                                    onChange={(e) => updatePrice(Number(e.target.value))}
+                                                />
+                                            </div>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min={priceStats.min}
+                                            max={priceStats.max}
+                                            step={Math.max(100, Math.round(priceStats.max / 50))}
+                                            value={priceMaxValue}
+                                            onChange={(e) => updatePrice(Number(e.target.value))}
+                                            className="w-full h-2 appearance-none cursor-pointer"
+                                            style={{
+                                                background: `linear-gradient(90deg, #0c0c0c ${pricePercent}%, #d6d1c8 ${pricePercent}%)`,
+                                                border: "1px solid rgba(0,0,0,0.28)",
+                                                borderRadius: 0,
+                                            }}
+                                        />
+                                        <div className="flex justify-between text-[10px] font-mono uppercase tracking-[0.18em] text-black/45">
+                                            <span>LKR {priceStats.min.toLocaleString()}</span>
+                                            <span>LKR {priceStats.max.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="featured-only"
+                                                type="checkbox"
+                                                checked={filters.featuredOnly}
+                                                onChange={() => setFilters((prev) => ({ ...prev, featuredOnly: !prev.featuredOnly }))}
+                                                className="h-4 w-4 accent-black border-black/30"
+                                            />
+                                            <label htmlFor="featured-only" className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/70">
+                                                Featured only
+                                            </label>
+                                        </div>
+                                    <button
+                                        onClick={() => setIsFiltersOpen(false)}
+                                        className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/60 hover:text-black"
+                                    >
+                                        Done
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }
