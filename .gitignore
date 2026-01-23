@@ -123,3 +123,5 @@ src/content/products.json
 server/data/products.json
 
 # Note: config.json is kept in git as it contains static configuration
+# Secrets / service accounts
+nirakara-fe982-firebase-adminsdk-fbsvc-f7b4b8a66a.json
