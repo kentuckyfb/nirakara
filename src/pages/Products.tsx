@@ -621,7 +621,7 @@ export default function Products() {
             {/* --- LENS --- */}
             <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
                 <div
-                    className={`absolute inset-0 ${isInteracting ? "backdrop-blur-0" : "backdrop-blur-[30px]"}`}
+                    className="absolute inset-0 backdrop-blur-[30px]"
                     style={{
                         maskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
                         WebkitMaskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
@@ -669,7 +669,7 @@ export default function Products() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.18 }}
-                            className="pointer-events-auto absolute top-20 right-0 md:right-10 px-4 md:px-0 w-full md:w-auto"
+                            className="pointer-events-auto absolute top-20 right-4 md:right-10 px-0 w-[90vw] max-w-[360px] md:w-auto"
                         >
                             <div className="mx-auto md:ml-auto md:mr-0 w-full md:w-[360px] bg-[#f7f5ef]/85 backdrop-blur-md border border-black/15 rounded-none p-5 flex flex-col gap-5">
                                 <div className="flex items-center justify-between">
