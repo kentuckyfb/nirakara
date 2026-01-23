@@ -183,6 +183,8 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
             >
                 <div
                     onClick={handleClick}
+                    data-product-card="true"
+                    data-slug={product.slug}
                     className="block w-full h-full pointer-events-auto cursor-pointer flex flex-col appearance-none"
                     draggable={false}
                 >
@@ -205,46 +207,6 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
                             <div className="text-[11px] font-brand uppercase tracking-[0.12em] text-black/80 leading-tight break-words">
                                 {product.name}
                             </div>
-                            {isFocused && !isMobile && (
-                                <div className="mt-2 flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.3em] text-black/60">
-                                    <motion.div
-                                        key={`${product.slug}-inquire`}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ duration: 0.35, ease: "easeOut" }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <Link
-                                            to={`/contact?product=${encodeURIComponent(product.unitCode || product.name)}`}
-                                            className="hover:text-black transition-colors"
-                                        >
-                                            Inquire
-                                        </Link>
-                                        <span className="inline-flex items-center gap-1">
-                                            <span className="h-[1px] w-10 bg-black/35" />
-                                            <span className="h-1.5 w-1.5 rounded-full border border-black/40" />
-                                        </span>
-                                    </motion.div>
-                                    <motion.div
-                                        key={`${product.slug}-buy`}
-                                        initial={{ opacity: 0, x: 10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ duration: 0.35, ease: "easeOut", delay: 0.05 }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <span className="inline-flex items-center gap-1">
-                                            <span className="h-1.5 w-1.5 rounded-full border border-black/40" />
-                                            <span className="h-[1px] w-10 bg-black/35" />
-                                        </span>
-                                        <Link
-                                            to={`/product/${product.slug}`}
-                                            className="hover:text-black transition-colors"
-                                        >
-                                            Buy
-                                        </Link>
-                                    </motion.div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -260,6 +222,7 @@ export default function Products() {
     const [focusedProduct, setFocusedProduct] = useState<Product | null>(null);
     const [isMobile, setIsMobile] = useState(false);
     const [isInteracting, setIsInteracting] = useState(false);
+    const [focusedRect, setFocusedRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -396,6 +359,54 @@ export default function Products() {
         }
         setFocusedProduct((prev) => prev ?? filteredProducts[0]);
     }, [filteredProducts]);
+
+    useEffect(() => {
+        if (!focusedProduct || isInteracting || isMobile) {
+            setFocusedRect(null);
+            return;
+        }
+
+        let rafId = 0;
+        const updateRect = () => {
+            const candidates = Array.from(
+                document.querySelectorAll(
+                    `[data-product-card="true"][data-slug="${focusedProduct.slug}"]`
+                )
+            ) as HTMLElement[];
+            if (candidates.length) {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                let bestRect: DOMRect | null = null;
+                let bestDistance = Number.POSITIVE_INFINITY;
+
+                candidates.forEach((el) => {
+                    const rect = el.getBoundingClientRect();
+                    const dx = rect.left + rect.width / 2 - centerX;
+                    const dy = rect.top + rect.height / 2 - centerY;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < bestDistance) {
+                        bestDistance = dist;
+                        bestRect = rect;
+                    }
+                });
+
+                if (bestRect) {
+                    setFocusedRect({
+                        x: bestRect.left,
+                        y: bestRect.top,
+                        width: bestRect.width,
+                        height: bestRect.height,
+                    });
+                }
+            }
+            rafId = window.requestAnimationFrame(updateRect);
+        };
+
+        rafId = window.requestAnimationFrame(updateRect);
+        return () => {
+            window.cancelAnimationFrame(rafId);
+        };
+    }, [focusedProduct, isInteracting, isMobile]);
 
     const springConfig = { stiffness: 400, damping: 50, mass: 1 };
     const springX = useSpring(x, springConfig);
@@ -764,6 +775,62 @@ export default function Products() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {focusedProduct && focusedRect && !isMobile && (
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={`${focusedProduct.slug}-inquire`}
+                            initial={{ opacity: 0, x: -18, y: -8, scale: 0.98 }}
+                            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -10, y: -4, scale: 0.98 }}
+                            transition={{ duration: 0.45, ease: "easeOut" }}
+                            className="pointer-events-auto absolute z-[120] text-[10px] font-mono uppercase tracking-[0.34em] text-black/75"
+                            style={{
+                                left: focusedRect.x - 18,
+                                top: focusedRect.y - 24,
+                            }}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    to={`/contact?product=${encodeURIComponent(focusedProduct.unitCode || focusedProduct.name)}`}
+                                    className="hover:text-black transition-colors"
+                                >
+                                    Inquire
+                                </Link>
+                                <span className="inline-flex items-center gap-1">
+                                    <span className="h-[1px] w-12 bg-black/55" />
+                                    <span className="h-2 w-2 rounded-full border border-black/55" />
+                                </span>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            key={`${focusedProduct.slug}-buy`}
+                            initial={{ opacity: 0, x: 18, y: 8, scale: 0.98 }}
+                            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: 10, y: 4, scale: 0.98 }}
+                            transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
+                            className="pointer-events-auto absolute z-[120] text-[10px] font-mono uppercase tracking-[0.34em] text-black/75"
+                            style={{
+                                left: focusedRect.x + focusedRect.width + 18,
+                                top: focusedRect.y + focusedRect.height * 0.45,
+                            }}
+                        >
+                            <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1">
+                                    <span className="h-2 w-2 rounded-full border border-black/55" />
+                                    <span className="h-[1px] w-12 bg-black/55" />
+                                </span>
+                                <Link
+                                    to={`/product/${focusedProduct.slug}`}
+                                    className="hover:text-black transition-colors"
+                                >
+                                    Buy
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+                )}
 
                 <div className="pointer-events-auto flex justify-center md:hidden">
                     {focusedProduct && !isInteracting && (
