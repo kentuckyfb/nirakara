@@ -70,6 +70,11 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
+.env.local
+
+# Secrets
+nirakara-fe982-firebase-adminsdk-fbsvc-f7b4b8a66a.json
+claude
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

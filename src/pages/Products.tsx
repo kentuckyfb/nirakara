@@ -141,6 +141,7 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
         return isMobile ? baseScale * zoomV : baseScale;
     });
 
+
     const opacity = 1;
     const zIndex = useTransform([x, y], ([vx, vy]: any[]) => {
         const { zOffset } = getSphereMetrics(vx, vy);
@@ -194,6 +195,8 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
                                 src={product.image}
                                 alt={product.name}
                                 className="h-full w-full object-contain"
+                                loading="lazy"
+                                decoding="async"
                                 draggable={false}
                             />
                         ) : (
@@ -408,7 +411,7 @@ export default function Products() {
         };
     }, [focusedProduct, isInteracting, isMobile]);
 
-    const springConfig = { stiffness: 400, damping: 50, mass: 1 };
+    const springConfig = { stiffness: 260, damping: 40, mass: 0.9 };
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
@@ -459,11 +462,11 @@ export default function Products() {
 
     const onPanStart = () => {
         isDragging.current = true;
-        if (isMobile) setIsInteracting(true);
+        setIsInteracting(true);
     };
     const onPan = (event: any, info: PanInfo) => {
-        x.set(x.get() + info.delta.x);
-        y.set(y.get() + info.delta.y);
+        x.set(x.get() + info.delta.x * 0.85);
+        y.set(y.get() + info.delta.y * 0.85);
     };
     const getWrappedValue = (v: number, base: number, total: number) => {
         const offset = v + base;
@@ -496,8 +499,8 @@ export default function Products() {
         const velY = info.velocity.y;
 
         // Snapping with slightly more momentum for tactile feel
-        const targetX = Math.round((x.get() + velX * 0.15) / distX) * distX;
-        const targetY = Math.round((y.get() + velY * 0.15) / distY) * distY;
+        const targetX = Math.round((x.get() + velX * 0.12) / distX) * distX;
+        const targetY = Math.round((y.get() + velY * 0.12) / distY) * distY;
 
         x.set(targetX);
         y.set(targetY);
@@ -505,9 +508,19 @@ export default function Products() {
         if (closest) {
             setFocusedProduct(closest);
         }
-        if (isMobile) {
-            window.setTimeout(() => setIsInteracting(false), 280);
-        }
+        window.setTimeout(() => setIsInteracting(false), 220);
+    };
+
+    const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!isMobile) return;
+        const target = event.target as HTMLElement | null;
+        if (target?.closest("a,button,[role='button']")) return;
+        setIsInteracting(true);
+    };
+
+    const onPointerUp = () => {
+        if (!isMobile) return;
+        window.setTimeout(() => setIsInteracting(false), 220);
     };
 
     const topButtonClass = "transition-colors flex items-center justify-center h-9 w-9 border border-black/20 bg-transparent text-black/60 hover:text-black hover:border-black/50 rounded-none";
@@ -521,8 +534,9 @@ export default function Products() {
                 style={{ perspective: "1700px", perspectiveOrigin: "50% 50%" }}
             >
                 <motion.div
-                    className="absolute inset-[-18%] opacity-[0.8]"
+                    className="absolute inset-[-18%]"
                     style={{
+                        opacity: isInteracting ? 0.35 : 0.8,
                         x: useTransform(springX, v => Number(v) * 0.018),
                         y: useTransform(springY, v => Number(v) * 0.018),
                         backgroundImage: `
@@ -539,8 +553,9 @@ export default function Products() {
 
                 {/* Slow trail layer for subtle motion */}
                 <motion.div
-                    className="absolute inset-[-20%] opacity-[0.12] pointer-events-none"
+                    className="absolute inset-[-20%] pointer-events-none"
                     style={{
+                        opacity: isInteracting ? 0.04 : 0.12,
                         x: useTransform(springX, v => Number(v) * 0.01),
                         y: useTransform(springY, v => Number(v) * 0.01),
                         backgroundImage: `
@@ -554,8 +569,9 @@ export default function Products() {
 
                 {/* Subtle grain that drifts with motion, stays behind cards */}
                 <motion.div
-                    className="absolute inset-[-22%] opacity-[0.05] mix-blend-multiply pointer-events-none"
+                    className="absolute inset-[-22%] mix-blend-multiply pointer-events-none"
                     style={{
+                        opacity: isInteracting ? 0.015 : 0.05,
                         x: useTransform(springX, v => Number(v) * -0.004),
                         y: useTransform(springY, v => Number(v) * -0.004),
                         backgroundImage: `
@@ -577,6 +593,8 @@ export default function Products() {
                             onPanStart={onPanStart}
                             onPan={onPan}
                             onPanEnd={onPanEnd}
+                            onPointerDown={onPointerDown}
+                            onPointerUp={onPointerUp}
                             className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
                         >
                             {gridItems.map((item, i) => (
@@ -603,7 +621,7 @@ export default function Products() {
             {/* --- LENS --- */}
             <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
                 <div
-                    className="absolute inset-0 backdrop-blur-[30px]"
+                    className={`absolute inset-0 ${isInteracting ? "backdrop-blur-0" : "backdrop-blur-[30px]"}`}
                     style={{
                         maskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
                         WebkitMaskImage: 'radial-gradient(circle at center, transparent 36%, black 92%)',
@@ -780,14 +798,14 @@ export default function Products() {
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={`${focusedProduct.slug}-inquire`}
-                            initial={{ opacity: 0, x: -18, y: -8, scale: 0.98 }}
+                            initial={{ opacity: 0, x: -18, y: -10, scale: 0.97 }}
                             animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -10, y: -4, scale: 0.98 }}
-                            transition={{ duration: 0.45, ease: "easeOut" }}
-                            className="pointer-events-auto absolute z-[120] text-[10px] font-mono uppercase tracking-[0.34em] text-black/75"
+                            exit={{ opacity: 0, x: -10, y: -6, scale: 0.97 }}
+                            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                            className="pointer-events-auto absolute z-[120] text-[11px] font-mono uppercase tracking-[0.38em] text-black/90"
                             style={{
                                 left: focusedRect.x - 18,
-                                top: focusedRect.y - 24,
+                                top: focusedRect.y + 80,
                             }}
                         >
                             <div className="flex items-center gap-2">
@@ -798,19 +816,19 @@ export default function Products() {
                                     Inquire
                                 </Link>
                                 <span className="inline-flex items-center gap-1">
-                                    <span className="h-[1px] w-12 bg-black/55" />
-                                    <span className="h-2 w-2 rounded-full border border-black/55" />
+                                    <span className="h-[1px] w-14 bg-black/85" />
+                                    <span className="h-2.5 w-2.5 rounded-full border border-black/85" />
                                 </span>
                             </div>
                         </motion.div>
 
                         <motion.div
                             key={`${focusedProduct.slug}-buy`}
-                            initial={{ opacity: 0, x: 18, y: 8, scale: 0.98 }}
+                            initial={{ opacity: 0, x: 18, y: 10, scale: 0.97 }}
                             animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: 10, y: 4, scale: 0.98 }}
-                            transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-                            className="pointer-events-auto absolute z-[120] text-[10px] font-mono uppercase tracking-[0.34em] text-black/75"
+                            exit={{ opacity: 0, x: 10, y: 6, scale: 0.97 }}
+                            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+                            className="pointer-events-auto absolute z-[120] text-[11px] font-mono uppercase tracking-[0.38em] text-black/90"
                             style={{
                                 left: focusedRect.x + focusedRect.width + 18,
                                 top: focusedRect.y + focusedRect.height * 0.45,
@@ -818,15 +836,15 @@ export default function Products() {
                         >
                             <div className="flex items-center gap-2">
                                 <span className="inline-flex items-center gap-1">
-                                    <span className="h-2 w-2 rounded-full border border-black/55" />
-                                    <span className="h-[1px] w-12 bg-black/55" />
+                                    <span className="h-2.5 w-2.5 rounded-full border border-black/85" />
+                                    <span className="h-[1px] w-10 bg-black/85" />
+                                    <Link
+                                        to={`/product/${focusedProduct.slug}`}
+                                        className="hover:text-black transition-colors"
+                                    >
+                                        Buy
+                                    </Link>
                                 </span>
-                                <Link
-                                    to={`/product/${focusedProduct.slug}`}
-                                    className="hover:text-black transition-colors"
-                                >
-                                    Buy
-                                </Link>
                             </div>
                         </motion.div>
                     </AnimatePresence>
