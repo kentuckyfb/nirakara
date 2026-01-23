@@ -1,8 +1,6 @@
 import { useState, useRef } from "react";
 import { useProducts, useAdminProducts } from "@/hooks/useProducts";
-import { login } from "@/lib/api";
-import { db } from "@/lib/firebase";
-import { doc, writeBatch } from "firebase/firestore";
+import { login, bulkUpsertProducts } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,22 +63,14 @@ export default function Admin() {
                     return;
                 }
 
-                const batch = writeBatch(db);
-                let count = 0;
+                const normalized = products.map((product: any) => ({
+                    ...product,
+                    id: product.slug || product.id,
+                    isVisible: product.isVisible ?? true,
+                }));
 
-                products.forEach((product: any) => {
-                    // Use slug as ID for consistency
-                    const docRef = doc(db, "products", product.slug || product.id);
-                    // Set default isVisible to true if not specified
-                    if (product.isVisible === undefined) {
-                        product.isVisible = true;
-                    }
-                    batch.set(docRef, product);
-                    count++;
-                });
-
-                await batch.commit();
-                alert(`Successfully uploaded ${count} products to Firebase! Refreshing...`);
+                await bulkUpsertProducts(normalized);
+                alert(`Successfully uploaded ${normalized.length} products to Supabase! Refreshing...`);
                 window.location.reload();
             } catch (error) {
                 console.error("Upload failed:", error);

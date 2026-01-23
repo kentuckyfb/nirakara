@@ -1,0 +1,362 @@
+[
+    {
+        "id": "ornate-gothic-signet-ring",
+        "slug": "ornate-gothic-signet-ring",
+        "name": "Ornate Gothic Signet Ring",
+        "unitCode": "RING-001",
+        "category": "ring",
+        "priceLKR": 16500,
+        "image": "/images/1.png",
+        "shortDescription": "A bold signet-style ring with carved gothic chrome-inspired detail.",
+        "description": "A chunky gothic signet ring featuring deep carved motifs and oxidised recesses for high contrast. Built with a strong silhouette and a comfortable inner fit for daily wear.",
+        "images": [
+            "/images/1.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Deep Carved Detail",
+            "Oxidised Contrast Finish",
+            "Comfort Fit Interior"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "9g"
+    },
+    {
+        "id": "fleur-de-lis-crown-ring",
+        "slug": "fleur-de-lis-crown-ring",
+        "name": "Fleur-de-Lis Crown Ring",
+        "unitCode": "RING-002",
+        "category": "ring",
+        "priceLKR": 19800,
+        "image": "/images/2.png",
+        "shortDescription": "A sculpted fleur-de-lis ring with a crown-like gothic profile.",
+        "description": "Inspired by cathedral ornamentation, this ring features a raised fleur-de-lis silhouette with heavy relief. Oxidised valleys create a strong, chrome-style contrast.",
+        "images": [
+            "/images/2.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Raised Fleur-de-Lis Sculpture",
+            "High Contrast Oxidation",
+            "Statement Profile"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "10g"
+    },
+    {
+        "id": "cross-skull-band-ring",
+        "slug": "cross-skull-band-ring",
+        "name": "Cross & Skull Band Ring",
+        "unitCode": "RING-003",
+        "category": "ring",
+        "priceLKR": 17500,
+        "image": "/images/3.png",
+        "shortDescription": "A thick band ring with crosses and a skull emblem centerpiece.",
+        "description": "A heavy gothic band designed with repeating cross elements and a central skull detail. The oxidised finish enhances depth and gives a worn-in metal character.",
+        "images": [
+            "/images/3.png"
+        ],
+        "highlights": [
+            "Solid Sterling Silver",
+            "Cross + Skull Motif",
+            "Chunky Band Width",
+            "Oxidised Vintage Look"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "11g"
+    },
+    {
+        "id": "floral-cross-crest-ring",
+        "slug": "floral-cross-crest-ring",
+        "name": "Floral Cross Crest Ring",
+        "unitCode": "RING-004",
+        "category": "ring",
+        "priceLKR": 16800,
+        "image": "/images/4.png",
+        "shortDescription": "A sharp crest ring with a floral cross face and engraved shoulders.",
+        "description": "A clean gothic crest ring featuring a floral cross emblem with subtle engraved details along the sides. Polished highlights keep the top face crisp and reflective.",
+        "images": [
+            "/images/4.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Floral Cross Crest",
+            "Engraved Side Details",
+            "Polished Highlights"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "8g"
+    },
+    {
+        "id": "full-skull-helm-ring",
+        "slug": "full-skull-helm-ring",
+        "name": "Full Skull Helm Ring",
+        "unitCode": "RING-005",
+        "category": "ring",
+        "priceLKR": 22000,
+        "image": "/images/5.png",
+        "shortDescription": "A statement skull ring with deep sculpting and heavy presence.",
+        "description": "This skull ring is built for impact: deep shadows, strong contours, and oxidised detailing that makes every sculpted line pop.",
+        "images": [
+            "/images/5.png"
+        ],
+        "highlights": [
+            "Statement Skull Design",
+            "Deep Sculpted Relief",
+            "Oxidised Contrast",
+            "Heavy Build"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "14g"
+    },
+    {
+        "id": "curb-chain-cross-band",
+        "slug": "curb-chain-cross-band",
+        "name": "Curb Chain Cross Band",
+        "unitCode": "RING-006",
+        "category": "ring",
+        "priceLKR": 18500,
+        "image": "/images/6.png",
+        "shortDescription": "A chain-textured band fused with a gothic cross centerpiece.",
+        "description": "A curb-chain texture wraps around the band, anchored by a bold gothic cross element. Designed to feel like metal hardware on the finger.",
+        "images": [
+            "/images/6.png"
+        ],
+        "highlights": [
+            "Sterling Silver",
+            "Curb Chain Texture",
+            "Gothic Cross Centerpiece",
+            "Oxidised Grooves"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "10g"
+    },
+    {
+        "id": "gothic-cross-cuff",
+        "slug": "gothic-cross-cuff",
+        "name": "Gothic Cross Cuff",
+        "unitCode": "BRC-007",
+        "category": "bracelet",
+        "priceLKR": 24500,
+        "image": "/images/7.png",
+        "shortDescription": "An open cuff bracelet engraved with chrome-style gothic crosses.",
+        "description": "A solid open cuff featuring engraved gothic cross motifs with oxidised recesses for depth. Adjustable fit with a clean, heavy-metal profile.",
+        "images": [
+            "/images/7.png"
+        ],
+        "highlights": [
+            "Open Cuff Design",
+            "Engraved Cross Motifs",
+            "Adjustable Fit",
+            "Sterling Silver"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "22g"
+    },
+    {
+        "id": "skull-link-bracelet",
+        "slug": "skull-link-bracelet",
+        "name": "Skull Link Bracelet",
+        "unitCode": "BRC-008",
+        "category": "bracelet",
+        "priceLKR": 32000,
+        "image": "/images/8.png",
+        "shortDescription": "A heavy chain bracelet with skull-link detailing.",
+        "description": "A chunky bracelet featuring integrated skull elements within a bold chain structure. Oxidised grooves enhance depth and texture.",
+        "images": [
+            "/images/8.png"
+        ],
+        "highlights": [
+            "Heavy Chain Build",
+            "Integrated Skull Details",
+            "Secure Clasp",
+            "Oxidised Finish"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "30g"
+    },
+    {
+        "id": "ornate-scroll-signet-ring",
+        "slug": "ornate-scroll-signet-ring",
+        "name": "Ornate Scroll Signet Ring",
+        "unitCode": "RING-009",
+        "category": "ring",
+        "priceLKR": 17000,
+        "image": "/images/9.png",
+        "shortDescription": "A gothic signet ring with scrollwork framing a cross emblem.",
+        "description": "This ring combines gothic scroll engravings with a centered cross emblem. Oxidised details add a dark chrome-like contrast around the face.",
+        "images": [
+            "/images/9.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Scrollwork Engraving",
+            "Centered Cross Emblem",
+            "Oxidised Recesses"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "9g"
+    },
+    {
+        "id": "onyx-gothic-band-ring",
+        "slug": "onyx-gothic-band-ring",
+        "name": "Onyx Gothic Band Ring",
+        "unitCode": "RING-010",
+        "category": "ring",
+        "priceLKR": 21000,
+        "image": "/images/10.png",
+        "shortDescription": "A gothic band ring featuring a dark onyx-style centerpiece.",
+        "description": "A sleek ring designed with a dark centerpiece set into a sharp gothic frame. Polished edges give it a clean chrome shine with a darker mood.",
+        "images": [
+            "/images/10.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Onyx-Style Center",
+            "Polished Edges",
+            "Comfort Fit Band"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "10g"
+    },
+    {
+        "id": "engraved-curb-band-ring",
+        "slug": "engraved-curb-band-ring",
+        "name": "Engraved Curb Band Ring",
+        "unitCode": "RING-011",
+        "category": "ring",
+        "priceLKR": 18000,
+        "image": "/images/11.png",
+        "shortDescription": "A thick ring with a curb-chain profile and engraved plate detail.",
+        "description": "A curb-chain inspired ring with a structured plate detail across the face. Oxidised grooves deepen the texture and create a brutalist chrome look.",
+        "images": [
+            "/images/11.png"
+        ],
+        "highlights": [
+            "Sterling Silver",
+            "Curb-Style Texture",
+            "Engraved Plate Detail",
+            "Oxidised Finish"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "11g"
+    },
+    {
+        "id": "jaw-skull-ring",
+        "slug": "jaw-skull-ring",
+        "name": "Jaw Skull Ring",
+        "unitCode": "RING-012",
+        "category": "ring",
+        "priceLKR": 23500,
+        "image": "/images/12.png",
+        "shortDescription": "A brutal skull ring featuring an aggressive jaw design.",
+        "description": "A heavier skull ring designed with exaggerated jaw structure and deep shadowed cuts. Made to look raw, violent, and unmistakably gothic.",
+        "images": [
+            "/images/12.png"
+        ],
+        "highlights": [
+            "Statement Skull Form",
+            "Deep Shadowed Carving",
+            "Oxidised Contrast",
+            "Heavyweight Feel"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "15g"
+    },
+    {
+        "id": "raw-texture-band-ring",
+        "slug": "raw-texture-band-ring",
+        "name": "Raw Texture Band Ring",
+        "unitCode": "RING-013",
+        "category": "ring",
+        "priceLKR": 15500,
+        "image": "/images/13.png",
+        "shortDescription": "A gritty textured ring with a raw-cast metal look.",
+        "description": "A rugged band ring with a raw texture that looks sand-cast and worn-in. Oxidised pits and roughness give it an aggressive industrial finish.",
+        "images": [
+            "/images/13.png"
+        ],
+        "highlights": [
+            "Raw-Cast Texture",
+            "Industrial Look",
+            "Oxidised Detailing",
+            "Thick Band Profile"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "brushed",
+        "weight": "9g"
+    },
+    {
+        "id": "gothic-letter-band-ring",
+        "slug": "gothic-letter-band-ring",
+        "name": "Gothic Letter Band Ring",
+        "unitCode": "RING-014",
+        "category": "ring",
+        "priceLKR": 14500,
+        "image": "/images/14.png",
+        "shortDescription": "A bold band ring featuring raised gothic lettering.",
+        "description": "A statement band ring with raised gothic lettering across the face. Designed for a clean chrome look with darker recessed detailing for contrast.",
+        "images": [
+            "/images/14.png"
+        ],
+        "highlights": [
+            "925 Sterling Silver",
+            "Raised Letter Detail",
+            "Polished Finish",
+            "Everyday Statement Band"
+        ],
+        "isFeatured": false,
+        "isVisible": true,
+        "finish": "polished",
+        "weight": "8g"
+    },
+    {
+        "id": "gothic-spike-bead-bracelet",
+        "slug": "gothic-spike-bead-bracelet",
+        "name": "Gothic Spike Bead Bracelet",
+        "unitCode": "BRC-015",
+        "category": "bracelet",
+        "priceLKR": 26000,
+        "image": "/images/15.png",
+        "shortDescription": "A bracelet featuring spiked bead hardware in chrome-style metalwork.",
+        "description": "A bold bracelet built with hardware-like beads and spiked forms, designed to look like gothic mechanical jewellery. High polish with oxidised shadows for depth.",
+        "images": [
+            "/images/15.png"
+        ],
+        "highlights": [
+            "Sterling Silver",
+            "Hardware Bead Design",
+            "Oxidised Shadows",
+            "Statement Wrist Piece"
+        ],
+        "isFeatured": true,
+        "isVisible": true,
+        "finish": "oxidised",
+        "weight": "18g"
+    }
+]

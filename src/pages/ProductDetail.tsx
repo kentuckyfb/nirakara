@@ -99,13 +99,13 @@ export default function ProductDetail() {
             <div className="relative aspect-square flex-1 border border-black/10 bg-gradient-to-br from-white to-neutral-50 flex items-center justify-center overflow-hidden">
               {product.images && product.images.length > 0 ? (
                 <img
-                  src={product.images[currentImageIndex]?.startsWith('http') ? product.images[currentImageIndex] : `http://localhost:3001${product.images[currentImageIndex]}`}
+                  src={product.images[currentImageIndex]}
                   alt={product.name}
                   className="w-full h-full object-cover select-none"
                 />
               ) : product.image ? (
                 <img
-                  src={product.image?.startsWith('http') ? product.image : `http://localhost:3001${product.image}`}
+                  src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover select-none"
                 />
