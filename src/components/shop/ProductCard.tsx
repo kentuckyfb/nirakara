@@ -25,12 +25,16 @@ export function ProductCard({ item, product, index }: ProductCardProps) {
           alt={item.code}
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+          onContextMenu={(event) => event.preventDefault()}
+          style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
         />
         <img
           src={secondaryImage}
           alt={`${item.code} alternate`}
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 scale-105"
+          onContextMenu={(event) => event.preventDefault()}
+          style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
         />
 
         {/* Overlay Details */}

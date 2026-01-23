@@ -3,13 +3,19 @@ import { motion, useMotionValue, useSpring, PanInfo, useTransform, AnimatePresen
 import { useProducts } from "@/hooks/useProducts";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Product } from "@/types/product";
-import { SlidersHorizontal, ShoppingBag, Tag, Gem, Coins, MessageSquare } from "lucide-react";
+import { SlidersHorizontal, ShoppingBag, MessageSquare } from "lucide-react";
 
 // --- Configuration ---
 const ITEM_WIDTH = 220;
 const ITEM_HEIGHT = 288;
 const GAP = 70; // Slightly more spacing between cards
-const DRAG_FACTOR = 1;
+const MOBILE_ITEM_WIDTH = 180;
+const MOBILE_ITEM_HEIGHT = 240;
+const MOBILE_GAP = 40;
+const TUNING = {
+    dragFactor: { desktop: 0.85, mobile: 1.8 },
+    momentumFactor: { desktop: 0.12, mobile: 0.12 }
+};
 
 // --- Components ---
 
@@ -25,13 +31,17 @@ interface ProductCardProps {
     isDragging: React.MutableRefObject<boolean>;
     focusedSlug?: string | null;
     isMobile: boolean;
+    isInteracting: boolean;
+    isZoomedIn: boolean;
+    onSelect?: (product: Product, deltaX: number, deltaY: number) => void;
+    onZoomOut?: () => void;
 }
 
-const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows, isDragging, focusedSlug, isMobile }: ProductCardProps) => {
+const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows, isDragging, focusedSlug, isMobile, isInteracting, isZoomedIn, onSelect, onZoomOut }: ProductCardProps) => {
     const navigate = useNavigate();
-    const width = ITEM_WIDTH;
-    const height = ITEM_HEIGHT;
-    const currentGap = GAP;
+    const width = isMobile ? MOBILE_ITEM_WIDTH : ITEM_WIDTH;
+    const height = isMobile ? MOBILE_ITEM_HEIGHT : ITEM_HEIGHT;
+    const currentGap = isMobile ? MOBILE_GAP : GAP;
     const isFocused = focusedSlug === product.slug;
 
     const baseX = (indexX - Math.floor(totalCols / 2)) * (width + currentGap);
@@ -94,7 +104,7 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
         const wy = getWrappedValue(Number(vy), baseY, totalRows * (height + currentGap));
         const { fx } = applyFisheye(wx, wy);
         const distanceScale = isMobile ? (0.45 + 0.55 * zoomV) : 1;
-        const heightLift = isMobile ? (1 - zoomV) * 60 : 0;
+        const heightLift = isMobile ? (1 - zoomV) * 6 : 0;
         return fx * zoomV * distanceScale + window.innerWidth / 2 - width / 2;
     });
 
@@ -103,7 +113,7 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
         const wy = getWrappedValue(Number(vy), baseY, totalRows * (height + currentGap));
         const { fy } = applyFisheye(wx, wy);
         const distanceScale = isMobile ? (0.45 + 0.55 * zoomV) : 1;
-        const heightLift = isMobile ? (1 - zoomV) * 60 : 0;
+        const heightLift = isMobile ? (1 - zoomV) * 6 : 0;
         return fy * zoomV * distanceScale + window.innerHeight / 2 - height / 2 - heightLift;
     });
 
@@ -148,13 +158,31 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
         return Math.round(1000 + zOffset * 10);
     });
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (isDragging.current) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
-        navigate(`/product/${product.slug}`);
+        if (isMobile && isZoomedIn && onZoomOut) {
+            e.preventDefault();
+            e.stopPropagation();
+            onZoomOut();
+            return;
+        }
+        if (isMobile && onSelect) {
+            e.preventDefault();
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const deltaX = centerX - window.innerWidth / 2;
+            const deltaY = centerY - window.innerHeight / 2;
+            onSelect(product, deltaX, deltaY);
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     return (
@@ -186,7 +214,7 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
                     onClick={handleClick}
                     data-product-card="true"
                     data-slug={product.slug}
-                    className="block w-full h-full pointer-events-auto cursor-pointer flex flex-col appearance-none"
+                    className={`block w-full h-full pointer-events-auto cursor-pointer flex flex-col appearance-none ${isFocused && isInteracting && isMobile ? "border border-dotted border-black/70" : ""}`}
                     draggable={false}
                 >
                     <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
@@ -198,6 +226,8 @@ const ProductCard = ({ product, x, y, zoom, indexX, indexY, totalCols, totalRows
                                 loading="lazy"
                                 decoding="async"
                                 draggable={false}
+                                onContextMenu={(event) => event.preventDefault()}
+                                style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
                             />
                         ) : (
                             <div className="text-black/30 font-mono text-[10px] uppercase tracking-[0.2em]">Image pending</div>
@@ -225,12 +255,21 @@ export default function Products() {
     const [focusedProduct, setFocusedProduct] = useState<Product | null>(null);
     const [isMobile, setIsMobile] = useState(false);
     const [isInteracting, setIsInteracting] = useState(false);
+    const [isZoomedIn, setIsZoomedIn] = useState(false);
+    const zoomOutAtRef = useRef(0);
     const [focusedRect, setFocusedRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+    const focusUpdateRef = useRef(0);
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
     const zoomBase = useMotionValue(1);
-    const zoom = useSpring(zoomBase, { stiffness: 260, damping: 36, mass: 1 });
+    const zoomSpring = useMemo(
+        () => (isMobile
+            ? { stiffness: 360, damping: 40, mass: 1.1 }
+            : { stiffness: 260, damping: 36, mass: 1 }),
+        [isMobile]
+    );
+    const zoom = useSpring(zoomBase, zoomSpring);
 
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -411,7 +450,12 @@ export default function Products() {
         };
     }, [focusedProduct, isInteracting, isMobile]);
 
-    const springConfig = { stiffness: 260, damping: 40, mass: 0.9 };
+    const springConfig = useMemo(
+        () => (isMobile
+            ? { stiffness: 220, damping: 60, mass: 1.8 }
+            : { stiffness: 260, damping: 40, mass: 0.9 }),
+        [isMobile]
+    );
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
@@ -457,16 +501,50 @@ export default function Products() {
     }, []);
 
     useEffect(() => {
-        zoomBase.set(isMobile && isInteracting ? 0.55 : 1);
-    }, [isMobile, isInteracting, zoomBase]);
+        if (!isMobile || isInteracting || isDragging.current) return;
+        if (!isZoomedIn) {
+            zoomBase.set(0.6);
+        }
+    }, [isMobile, isZoomedIn, isInteracting, zoomBase]);
+
+    const handleZoomOut = () => {
+        zoomOutAtRef.current = window.performance.now();
+        zoomBase.set(0.6);
+        setIsZoomedIn(false);
+        setIsInteracting(false);
+    };
+
+    const handleTouchStartCapture = (event: React.TouchEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest("a,button,[role='button']")) return;
+        if (isMobile && isZoomedIn) {
+            handleZoomOut();
+        }
+    };
 
     const onPanStart = () => {
         isDragging.current = true;
         setIsInteracting(true);
+        if (isMobile) {
+            setIsZoomedIn(false);
+            zoomBase.set(0.6);
+        }
     };
+
     const onPan = (event: any, info: PanInfo) => {
-        x.set(x.get() + info.delta.x * 0.85);
-        y.set(y.get() + info.delta.y * 0.85);
+        const dragFactor = isMobile ? TUNING.dragFactor.mobile : TUNING.dragFactor.desktop;
+        let nextX = x.get() + info.delta.x * dragFactor;
+        let nextY = y.get() + info.delta.y * dragFactor;
+        x.set(nextX);
+        y.set(nextY);
+        const now = window.performance.now();
+        if (now - focusUpdateRef.current > 90) {
+            focusUpdateRef.current = now;
+            const closest = getClosestProductAtPosition(x.get(), y.get());
+            if (closest) {
+                setFocusedProduct(closest);
+            }
+        }
     };
     const getWrappedValue = (v: number, base: number, total: number) => {
         const offset = v + base;
@@ -474,13 +552,16 @@ export default function Products() {
     };
     const getClosestProductAtPosition = (posX: number, posY: number) => {
         if (!gridItems.length) return null;
-        const totalW = GRID_COLS * (ITEM_WIDTH + GAP);
-        const totalH = GRID_ROWS * (ITEM_HEIGHT + GAP);
+        const itemWidth = isMobile ? MOBILE_ITEM_WIDTH : ITEM_WIDTH;
+        const itemHeight = isMobile ? MOBILE_ITEM_HEIGHT : ITEM_HEIGHT;
+        const itemGap = isMobile ? MOBILE_GAP : GAP;
+        const totalW = GRID_COLS * (itemWidth + itemGap);
+        const totalH = GRID_ROWS * (itemHeight + itemGap);
         let best: { product: Product; distance: number } | null = null;
 
         gridItems.forEach((item) => {
-            const baseX = (item.indexX - Math.floor(GRID_COLS / 2)) * (ITEM_WIDTH + GAP);
-            const baseY = (item.indexY - Math.floor(GRID_ROWS / 2)) * (ITEM_HEIGHT + GAP);
+            const baseX = (item.indexX - Math.floor(GRID_COLS / 2)) * (itemWidth + itemGap);
+            const baseY = (item.indexY - Math.floor(GRID_ROWS / 2)) * (itemHeight + itemGap);
             const wx = getWrappedValue(posX, baseX, totalW);
             const wy = getWrappedValue(posY, baseY, totalH);
             const distance = Math.sqrt(wx * wx + wy * wy);
@@ -493,14 +574,15 @@ export default function Products() {
     };
     const onPanEnd = (event: any, info: PanInfo) => {
         setTimeout(() => { isDragging.current = false; }, 50);
-        const distX = ITEM_WIDTH + GAP;
-        const distY = ITEM_HEIGHT + GAP;
+        const distX = (isMobile ? MOBILE_ITEM_WIDTH : ITEM_WIDTH) + (isMobile ? MOBILE_GAP : GAP);
+        const distY = (isMobile ? MOBILE_ITEM_HEIGHT : ITEM_HEIGHT) + (isMobile ? MOBILE_GAP : GAP);
         const velX = info.velocity.x;
         const velY = info.velocity.y;
 
         // Snapping with slightly more momentum for tactile feel
-        const targetX = Math.round((x.get() + velX * 0.12) / distX) * distX;
-        const targetY = Math.round((y.get() + velY * 0.12) / distY) * distY;
+        const momentumFactor = isMobile ? TUNING.momentumFactor.mobile : TUNING.momentumFactor.desktop;
+        const targetX = Math.round((x.get() + velX * momentumFactor) / distX) * distX;
+        const targetY = Math.round((y.get() + velY * momentumFactor) / distY) * distY;
 
         x.set(targetX);
         y.set(targetY);
@@ -511,16 +593,25 @@ export default function Products() {
         window.setTimeout(() => setIsInteracting(false), 220);
     };
 
-    const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const handleSelectProduct = (product: Product, deltaX: number, deltaY: number) => {
         if (!isMobile) return;
-        const target = event.target as HTMLElement | null;
-        if (target?.closest("a,button,[role='button']")) return;
+        if (window.performance.now() - zoomOutAtRef.current < 260) return;
+        const zoomValue = zoom.get();
+        const targetX = x.get() - deltaX / Math.max(zoomValue, 0.01);
+        const targetY = y.get() - deltaY / Math.max(zoomValue, 0.01);
+        setFocusedProduct(product);
         setIsInteracting(true);
-    };
-
-    const onPointerUp = () => {
-        if (!isMobile) return;
-        window.setTimeout(() => setIsInteracting(false), 220);
+        setIsZoomedIn(false);
+        zoomBase.set(0.6);
+    x.set(targetX);
+    y.set(targetY);
+    window.setTimeout(() => {
+      x.set(targetX);
+      y.set(targetY);
+      zoomBase.set(1);
+      setIsZoomedIn(true);
+      setIsInteracting(false);
+    }, 240);
     };
 
     const topButtonClass = "transition-colors flex items-center justify-center h-9 w-9 border border-black/20 bg-transparent text-black/60 hover:text-black hover:border-black/50 rounded-none";
@@ -536,14 +627,14 @@ export default function Products() {
                 <motion.div
                     className="absolute inset-[-18%]"
                     style={{
-                        opacity: isInteracting ? 0.35 : 0.8,
+                        opacity: 0.95,
                         x: useTransform(springX, v => Number(v) * 0.018),
                         y: useTransform(springY, v => Number(v) * 0.018),
                         backgroundImage: `
-                            radial-gradient(circle at 22% 28%, rgba(0,0,0,0.08) 0 140px, transparent 230px),
-                            radial-gradient(circle at 78% 68%, rgba(0,0,0,0.07) 0 180px, transparent 280px),
-                            radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0 220px, transparent 340px),
-                            radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px),
+                            radial-gradient(circle at 22% 28%, rgba(0,0,0,0.12) 0 160px, transparent 260px),
+                            radial-gradient(circle at 78% 68%, rgba(0,0,0,0.1) 0 200px, transparent 300px),
+                            radial-gradient(circle at 50% 50%, rgba(0,0,0,0.08) 0 240px, transparent 360px),
+                            radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px),
                             linear-gradient(135deg, hsl(var(--color-bg)) 0%, hsl(var(--color-bg)) 100%)
                         `,
                         backgroundSize: 'auto, auto, auto, 18px 18px, cover',
@@ -555,12 +646,12 @@ export default function Products() {
                 <motion.div
                     className="absolute inset-[-20%] pointer-events-none"
                     style={{
-                        opacity: isInteracting ? 0.04 : 0.12,
+                        opacity: 0.18,
                         x: useTransform(springX, v => Number(v) * 0.01),
                         y: useTransform(springY, v => Number(v) * 0.01),
                         backgroundImage: `
-                            repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 120px),
-                            repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 120px)
+                            repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 120px),
+                            repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 120px)
                         `,
                         backgroundSize: '140px 140px, 140px 140px',
                         filter: 'blur(0.6px)'
@@ -571,12 +662,12 @@ export default function Products() {
                 <motion.div
                     className="absolute inset-[-22%] mix-blend-multiply pointer-events-none"
                     style={{
-                        opacity: isInteracting ? 0.015 : 0.05,
+                        opacity: 0.1,
                         x: useTransform(springX, v => Number(v) * -0.004),
                         y: useTransform(springY, v => Number(v) * -0.004),
                         backgroundImage: `
-                            repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px),
-                            repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px)
+                            repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 3px),
+                            repeating-linear-gradient(90deg, rgba(0,0,0,0.018) 0px, rgba(0,0,0,0.018) 1px, transparent 1px, transparent 3px)
                         `,
                         backgroundSize: '160px 160px, 180px 180px',
                         filter: 'blur(0.25px)'
@@ -590,11 +681,10 @@ export default function Products() {
                 ) : (
                     <div className="relative z-20">
                         <motion.div
+                            onTouchStartCapture={handleTouchStartCapture}
                             onPanStart={onPanStart}
                             onPan={onPan}
                             onPanEnd={onPanEnd}
-                            onPointerDown={onPointerDown}
-                            onPointerUp={onPointerUp}
                             className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
                         >
                             {gridItems.map((item, i) => (
@@ -611,6 +701,10 @@ export default function Products() {
                                     isDragging={isDragging}
                                     focusedSlug={focusedProduct?.slug}
                                     isMobile={isMobile}
+                                    isInteracting={isInteracting}
+                                    isZoomedIn={isZoomedIn}
+                                    onSelect={handleSelectProduct}
+                                    onZoomOut={handleZoomOut}
                                 />
                             ))}
                         </motion.div>
@@ -671,7 +765,8 @@ export default function Products() {
                             transition={{ duration: 0.18 }}
                             className="pointer-events-auto absolute top-20 right-4 md:right-10 px-0 w-[90vw] max-w-[360px] md:w-auto"
                         >
-                            <div className="mx-auto md:ml-auto md:mr-0 w-full md:w-[360px] bg-[#f7f5ef]/85 backdrop-blur-md border border-black/15 rounded-none p-5 flex flex-col gap-5">
+                            <div className="mx-auto md:ml-auto md:mr-0 w-full md:w-[360px] border border-black/25 bg-[#f5f3ee]/90 backdrop-blur-sm rounded-none p-5 flex flex-col gap-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
+                                <div className="h-px w-full bg-gradient-to-r from-transparent via-black/20 to-transparent" />
                                 <div className="flex items-center justify-between">
                                     <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-black/70">Filters</span>
                                     <button
@@ -693,11 +788,10 @@ export default function Products() {
                                                 <button
                                                     key={cat}
                                                     onClick={() => toggleCategory(cat)}
-                                                    className={`px-3 py-2 border text-[9px] uppercase tracking-[0.28em] transition-colors ${
-                                                        active
-                                                            ? "border-black/70 text-black"
-                                                            : "border-black/20 text-black/50 hover:border-black/40 hover:text-black/70"
-                                                    }`}
+                                                    className={`px-3 py-2 border text-[9px] uppercase tracking-[0.28em] transition-colors ${active
+                                                        ? "border-black/70 text-black"
+                                                        : "border-black/20 text-black/50 hover:border-black/40 hover:text-black/70"
+                                                        }`}
                                                 >
                                                     {cat}
                                                 </button>
@@ -718,11 +812,10 @@ export default function Products() {
                                                     <button
                                                         key={finish}
                                                         onClick={() => toggleFinish(finish)}
-                                                        className={`px-3 py-2 border text-[9px] uppercase tracking-[0.28em] transition-colors ${
-                                                            active
-                                                                ? "border-black/70 text-black"
-                                                                : "border-black/20 text-black/50 hover:border-black/40 hover:text-black/70"
-                                                        }`}
+                                                        className={`px-3 py-2 border text-[9px] uppercase tracking-[0.28em] transition-colors ${active
+                                                            ? "border-black/70 text-black"
+                                                            : "border-black/20 text-black/50 hover:border-black/40 hover:text-black/70"
+                                                            }`}
                                                     >
                                                         {finish}
                                                     </button>
@@ -770,18 +863,18 @@ export default function Products() {
                                 )}
 
                                 <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                id="featured-only"
-                                                type="checkbox"
-                                                checked={filters.featuredOnly}
-                                                onChange={() => setFilters((prev) => ({ ...prev, featuredOnly: !prev.featuredOnly }))}
-                                                className="h-4 w-4 accent-black border-black/30"
-                                            />
-                                            <label htmlFor="featured-only" className="text-[9px] font-mono uppercase tracking-[0.3em] text-black/60">
-                                                Featured only
-                                            </label>
-                                        </div>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="featured-only"
+                                            type="checkbox"
+                                            checked={filters.featuredOnly}
+                                            onChange={() => setFilters((prev) => ({ ...prev, featuredOnly: !prev.featuredOnly }))}
+                                            className="h-4 w-4 accent-black border-black/30"
+                                        />
+                                        <label htmlFor="featured-only" className="text-[9px] font-mono uppercase tracking-[0.3em] text-black/60">
+                                            Featured only
+                                        </label>
+                                    </div>
                                     <button
                                         onClick={() => setIsFiltersOpen(false)}
                                         className="text-[9px] font-mono uppercase tracking-[0.3em] text-black/60 hover:text-black"
@@ -851,13 +944,11 @@ export default function Products() {
                 )}
 
                 <div className="pointer-events-auto flex justify-center md:hidden">
-                    {focusedProduct && !isInteracting && (
+                    {focusedProduct && !isInteracting && isZoomedIn && (
                         <div className="text-center px-6 py-2 bg-transparent">
                             <p className="text-[9px] uppercase tracking-[0.45em] text-black/40 font-mono flex items-center justify-center gap-2">
-                                <Tag className="h-3 w-3" />
                                 {focusedProduct.unitCode || focusedProduct.name}
                                 <span className="text-black/25">·</span>
-                                <Gem className="h-3 w-3" />
                                 {focusedProduct.category}
                             </p>
                             <h2 className="mt-2 text-sm font-brand uppercase tracking-[0.18em] text-black">
@@ -866,11 +957,6 @@ export default function Products() {
                             <p className="mt-3 text-base font-semibold text-black">
                                 LKR {focusedProduct.priceLKR.toLocaleString()}
                             </p>
-                            <div className="mt-3 flex items-center justify-center gap-2">
-                                <div className="h-px w-8 bg-black/10" />
-                                <p className="text-[8px] uppercase tracking-[0.5em] text-black/30">Not Available Online</p>
-                                <div className="h-px w-8 bg-black/10" />
-                            </div>
                             <div className="mt-3 flex items-center justify-center gap-4">
                                 <Link
                                     to={`/contact?product=${encodeURIComponent(focusedProduct.unitCode || focusedProduct.name)}`}
